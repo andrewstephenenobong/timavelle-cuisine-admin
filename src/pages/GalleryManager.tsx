@@ -1,0 +1,171 @@
+import { useEffect, useState } from 'react';
+import api from '../lib/api';
+
+interface GalleryImage {
+  _id: string;
+  imageUrl: string;
+  caption?: string;
+  category: string;
+}
+
+const emptyForm = { imageUrl: '', caption: '', category: '' };
+
+export default function GalleryManager() {
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function fetchImages() {
+    setLoading(true);
+    try {
+      const res = await api.get('/api/gallery');
+      setImages(res.data.images);
+    } catch {
+      setError('Could not load gallery images.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  function openCreateForm() {
+    setForm(emptyForm);
+    setEditingId(null);
+    setShowForm(true);
+  }
+
+  function openEditForm(image: GalleryImage) {
+    setForm({ imageUrl: image.imageUrl, caption: image.caption || '', category: image.category });
+    setEditingId(image._id);
+    setShowForm(true);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      if (editingId) {
+        await api.put(`/api/gallery/${editingId}`, form);
+      } else {
+        await api.post('/api/gallery', form);
+      }
+      setShowForm(false);
+      await fetchImages();
+    } catch {
+      setError('Something went wrong saving this image.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this image? This cannot be undone.')) return;
+    try {
+      await api.delete(`/api/gallery/${id}`);
+      await fetchImages();
+    } catch {
+      setError('Something went wrong deleting this image.');
+    }
+  }
+
+  return (
+    <div>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-display text-2xl font-semibold text-emerald-deep">Gallery</h2>
+        <button
+          onClick={openCreateForm}
+          className="rounded-full bg-gold px-5 py-2 font-utility text-sm font-medium text-emerald-deep hover:bg-emerald hover:text-ivory"
+        >
+          + Add Image
+        </button>
+      </div>
+
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="mb-8 rounded-3xl bg-white p-6 shadow-lg">
+          <h3 className="mb-4 font-display text-lg font-semibold text-ink">
+            {editingId ? 'Edit Image' : 'New Image'}
+          </h3>
+          <input
+            value={form.imageUrl}
+            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+            placeholder="Image URL"
+            required
+            className="w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
+          />
+          <input
+            value={form.category}
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
+            placeholder="Category (e.g. Plated, Events, Kitchen)"
+            required
+            className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
+          />
+          <input
+            value={form.caption}
+            onChange={(e) => setForm({ ...form, caption: e.target.value })}
+            placeholder="Caption (optional)"
+            className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
+          />
+
+          <div className="mt-6 flex gap-3">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-full bg-emerald px-6 py-2 font-utility text-sm text-ivory hover:bg-emerald-deep disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : 'Save'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="rounded-full border border-stone/30 px-6 py-2 font-utility text-sm text-stone hover:bg-stone/10"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
+      {loading ? (
+        <p className="font-body text-stone">Loading…</p>
+      ) : images.length === 0 ? (
+        <p className="font-body text-stone">No images yet. Add your first one above.</p>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {images.map((image) => (
+            <div key={image._id} className="overflow-hidden rounded-2xl bg-white shadow">
+              <img src={image.imageUrl} alt={image.caption || image.category} className="h-40 w-full object-cover" />
+              <div className="p-4">
+                <p className="font-utility text-xs uppercase tracking-wide text-stone/70">{image.category}</p>
+                {image.caption && <p className="mt-1 font-body text-sm text-stone">{image.caption}</p>}
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => openEditForm(image)}
+                    className="rounded-full border border-emerald px-3 py-1 font-utility text-xs text-emerald hover:bg-emerald hover:text-ivory"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(image._id)}
+                    className="rounded-full border border-red-400 px-3 py-1 font-utility text-xs text-red-500 hover:bg-red-500 hover:text-white"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
