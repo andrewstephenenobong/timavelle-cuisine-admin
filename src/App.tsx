@@ -8,6 +8,7 @@ import MenuManager from './pages/MenuManager';
 import GalleryManager from './pages/GalleryManager';
 import TestimonialsManager from './pages/TestimonialsManager';
 import Settings from './pages/Settings';
+import ContentManager from './pages/ContentManager';
 
 export default function App() {
   return (
@@ -26,6 +27,9 @@ export default function App() {
             <Route path="/dashboard/menu" element={<MenuManager />} />
             <Route path="/dashboard/gallery" element={<GalleryManager />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManager />} />
+            <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
+            <Route path="/dashboard/faqs" element={<ContentManager kind="faqs" />} />
+            <Route path="/dashboard/contact" element={<ContentManager kind="contact" />} />
             <Route path="/dashboard/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

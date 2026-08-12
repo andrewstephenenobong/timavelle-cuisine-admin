@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import React from 'react';
+import { PUBLIC_SITE_URL } from '../lib/site';
 
 const IconBase = ({ children, size = 18 }: { children: React.ReactNode; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">{children}</svg>;
 export const LayoutDashboard = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="3" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /></IconBase>;
@@ -18,6 +19,9 @@ const navItems = [
   { label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
   { label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
   { label: 'Testimonials', to: '/dashboard/testimonials', icon: Quote },
+  { label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },
+  { label: 'FAQs', to: '/dashboard/faqs', icon: Quote },
+  { label: 'Contact', to: '/dashboard/contact', icon: ImageIcon },
   { label: 'Settings', to: '/dashboard/settings', icon: SettingsIcon },
 ];
 
@@ -27,7 +31,7 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const handleLogout = () => { logout(); navigate('/login'); };
-  const currentLabel = navItems.find((item) => location.pathname === item.to || location.pathname.startsWith(`${item.to}/`))?.label ?? 'Overview';
+  const currentLabel = navItems.find((item) => location.pathname === item.to)?.label ?? navItems.find((item) => location.pathname.startsWith(`${item.to}/`))?.label ?? 'Overview';
   const sidebarContent = <><div className="admin-shell__brand"><span className="ad-mark" aria-hidden="true"><i /><i /><i /></span><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span></div><div className="admin-shell__stamp">Private culinary house<span>Content control room</span></div><div className="admin-shell__label">Workspace</div><nav className="admin-shell__nav">{navItems.map((item) => { const Icon = item.icon; const active = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`); return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} data-active={active} aria-current={active ? 'page' : undefined}><Icon size={18} />{item.label}{item.label === 'Testimonials' && <span className="admin-shell__badge">Review</span>}</Link>; })}</nav><div className="admin-shell__divider" /><div className="admin-shell__label">System</div><a className="admin-shell__nav" href="mailto:hello@timavellecuisine.com" style={{ textDecoration: 'none' }}><span style={{ color: 'rgba(247,245,240,.62)' }}>?</span>Help centre</a><div className="admin-shell__bottom"><div className="admin-shell__status">API connection staged<small>Preview mode · no live writes</small></div><button className="admin-shell__logout" onClick={handleLogout}><LogOut size={17} />Log out</button></div></>;
-  return <div className="admin-shell"><aside className="admin-shell__sidebar" data-open={open}>{sidebarContent}</aside><div className="admin-shell__main"><header className="admin-shell__mobilebar"><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span><button onClick={() => setOpen(true)} aria-label="Open navigation"><Menu size={23} /></button></header><header className="admin-topbar"><span className="admin-topbar__crumb">Timavelle / <strong>{currentLabel}</strong></span><div className="admin-topbar__actions"><button className="admin-topbar__notice" aria-label="Notifications">•</button><a className="admin-topbar__link" href="/" target="_blank" rel="noreferrer">View site ↗</a><button className="admin-topbar__link" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'}>{open ? 'Close' : 'Menu'}</button></div></header><main><Outlet /></main></div>{open && <button className="fixed inset-0 z-20 hidden bg-black/40 md:hidden" aria-label="Close navigation overlay" onClick={() => setOpen(false)} />}</div>;
+  return <div className="admin-shell"><aside className="admin-shell__sidebar" data-open={open}>{sidebarContent}</aside><div className="admin-shell__main"><header className="admin-shell__mobilebar"><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span><button onClick={() => setOpen(true)} aria-label="Open navigation"><Menu size={23} /></button></header><header className="admin-topbar"><span className="admin-topbar__crumb">Timavelle / <strong>{currentLabel}</strong></span><div className="admin-topbar__actions"><button className="admin-topbar__notice" aria-label="Notifications">•</button><a className="admin-topbar__link" href={PUBLIC_SITE_URL} target="_blank" rel="noreferrer">View site ↗</a><button className="admin-topbar__link" onClick={() => setOpen(!open)} aria-label={open ? 'Close navigation' : 'Open navigation'}>{open ? 'Close' : 'Menu'}</button></div></header><main><Outlet /></main></div>{open && <button className="fixed inset-0 z-20 hidden bg-black/40 md:hidden" aria-label="Close navigation overlay" onClick={() => setOpen(false)} />}</div>;
 }
