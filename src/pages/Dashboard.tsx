@@ -1,10 +1,13 @@
+import { Link } from 'react-router-dom';
+import { ImageIcon, LayoutDashboard, Quote, UtensilsCrossed } from '../components/DashboardLayout';
+
+const surfaces = [
+  { label: 'Menu', state: 'Live data', detail: 'Keep the public menu focused.', icon: UtensilsCrossed, to: '/dashboard/menu' },
+  { label: 'Gallery', state: 'Live data', detail: 'Shape the visual appetite.', icon: ImageIcon, to: '/dashboard/gallery' },
+  { label: 'Testimonials', state: 'Review queue', detail: 'Approve stories before publishing.', icon: Quote, to: '/dashboard/testimonials' },
+  { label: 'Enquiries', state: 'API pending', detail: 'Connect the public enquiry path.', icon: LayoutDashboard, to: '/dashboard/settings' },
+];
+
 export default function Dashboard() {
-  return (
-    <div>
-      <h2 className="font-display text-2xl font-semibold text-emerald-deep">Overview</h2>
-      <p className="mt-4 font-body text-stone">
-        Use the navigation above to manage Menu, Gallery, and Testimonials content.
-      </p>
-    </div>
-  );
+  return <div className="admin-page"><div className="admin-page__head"><div><div className="admin-page__eyebrow">Tuesday, 12 August 2026</div><h2>Good morning, <em>Timavelle.</em></h2><p className="admin-page__intro">A considered view of the content that shapes your public table.</p></div><Link className="admin-action" to="/dashboard/menu">Review content ↗</Link></div><div className="admin-stat-grid">{surfaces.map((surface) => <Link key={surface.label} to={surface.to} className="admin-stat" style={{ textDecoration: 'none', color: 'inherit' }}><span className="admin-stat__label">{surface.label}</span><strong>{surface.state}</strong><small>{surface.detail}</small></Link>)}</div><div className="admin-card-grid"><section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><Quote size={16} /></span><span className="admin-activity__copy"><strong>Testimonial review</strong><small>Use the content queue before publishing</small></span><span className="admin-activity__time">Review</span></div></div></section><section className="admin-card"><div className="admin-card__eyebrow">Next to consider</div><h3>Lead workflow</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Connect the enquiry path.</strong>The public form already has a clear place in the experience. Connect the existing API before treating this workspace as live.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/settings">Review settings ↗</Link></section></div><section className="admin-card admin-status-card"><div className="admin-card__eyebrow">Workspace health</div><h3>Everything is staged for a more considered table.</h3><p>Your content surfaces are organized. Connect the API before publishing live changes.</p><div className="admin-status-bar"><span /></div></section></div>;
 }
