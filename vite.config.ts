@@ -4,4 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: { host: true, allowedHosts: ['.manus.computer'] },
+  preview: { host: true, allowedHosts: ['.manus.computer'] },
 })
