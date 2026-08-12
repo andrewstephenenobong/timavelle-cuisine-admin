@@ -6,6 +6,7 @@ const navItems = [
   { label: 'Menu', to: '/dashboard/menu' },
   { label: 'Gallery', to: '/dashboard/gallery' },
   { label: 'Testimonials', to: '/dashboard/testimonials' },
+  { label: 'Settings', to: '/dashboard/settings' },
 ];
 
 export default function DashboardLayout() {

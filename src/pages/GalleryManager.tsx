@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
+import ImageUploadField from '../components/ImageUploadField';
 
 interface GalleryImage {
   _id: string;
@@ -95,13 +96,7 @@ export default function GalleryManager() {
           <h3 className="mb-4 font-display text-lg font-semibold text-ink">
             {editingId ? 'Edit Image' : 'New Image'}
           </h3>
-          <input
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-            placeholder="Image URL"
-            required
-            className="w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
-          />
+          <ImageUploadField value={form.imageUrl} onChange={(url) => setForm({ ...form, imageUrl: url })} />
           <input
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
+import ImageUploadField from '../components/ImageUploadField';
 
 interface MenuItem {
   _id: string;
@@ -127,12 +128,9 @@ export default function MenuManager() {
             rows={3}
             className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
           />
-          <input
-            value={form.image}
-            onChange={(e) => setForm({ ...form, image: e.target.value })}
-            placeholder="Image URL (optional)"
-            className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
-          />
+          <div className="mt-4">
+            <ImageUploadField value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
+          </div>
           <label className="mt-4 flex items-center gap-2 font-body text-sm text-stone">
             <input
               type="checkbox"
