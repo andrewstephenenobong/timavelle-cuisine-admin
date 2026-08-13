@@ -189,14 +189,14 @@ export default function TestimonialsManager() {
             <div key={t._id} className="flex items-start justify-between gap-4 rounded-2xl bg-white p-5 shadow">
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-display text-lg font-semibold text-ink">{t.clientName}</h4>
+                  <h3 className="font-display text-lg font-semibold text-ink">{t.clientName}</h3>
                   {t.featured && (
                     <span className="rounded-full bg-gold/20 px-2 py-0.5 font-utility text-xs text-emerald-deep">
                       Featured
                     </span>
                   )}
                 </div>
-                {t.eventType && <p className="font-utility text-xs uppercase tracking-wide text-stone/70">{t.eventType}</p>}
+                {t.eventType && <p className="font-utility text-xs uppercase tracking-wide text-stone">{t.eventType}</p>}
                 <p className="mt-1 font-body text-sm italic text-stone">&ldquo;{t.quote}&rdquo;</p>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -209,7 +209,7 @@ export default function TestimonialsManager() {
                 <button
                   onClick={() => setPendingDelete(t)}
                   disabled={deletingId === t._id}
-                  className="rounded-full border border-red-400 px-4 py-1.5 font-utility text-xs text-red-500 hover:bg-red-500 hover:text-white"
+                  className="rounded-full border border-red-400 px-4 py-1.5 font-utility text-xs text-red-500 hover:bg-red-700 hover:text-white"
                 >
                   Delete
                 </button>

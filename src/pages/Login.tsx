@@ -5,6 +5,7 @@ import api from '../lib/api';
 import { useAuth } from '../hooks/useAuth';
 import './login.css';
 import { PUBLIC_SITE_URL } from '../lib/site';
+import './login-a11y.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
