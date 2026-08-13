@@ -1,4 +1,95 @@
-/* Enquiry inbox deletion: keep the destructive action visible, explicit, and usable on narrow screens. */
+/* Timavelle enquiry inbox: calm reversible lead operations, explicit destructive actions, and usable bulk controls on narrow screens. */
+.admin-enquiries__bulk-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin: 14px 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(13, 91, 69, 0.16);
+  background: rgba(13, 91, 69, 0.045);
+  color: var(--ad-green);
+  font: 11px var(--font-body);
+}
+
+.admin-enquiries__bulk-toolbar label,
+.admin-enquiries__row-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.admin-enquiries__bulk-toolbar input,
+.admin-enquiries__row-check input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--ad-gold);
+}
+
+.admin-enquiries__bulk-toolbar > span {
+  color: var(--ad-muted);
+}
+
+.admin-enquiries__bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.admin-enquiries__rows {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-enquiries__row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  border: 1px solid transparent;
+}
+
+.admin-enquiries__row[data-selected='true'] {
+  border-color: rgba(13, 91, 69, 0.3);
+  background: rgba(13, 91, 69, 0.045);
+}
+
+.admin-enquiries__row-check {
+  flex: 0 0 42px;
+  justify-content: center;
+}
+
+.admin-enquiries__row-select {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 13px 10px 13px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-enquiries__row-select:focus-visible,
+.admin-enquiries__row-check:has(input:focus-visible) {
+  outline: 2px solid var(--ad-gold);
+  outline-offset: 2px;
+}
+
+.admin-enquiries__archive {
+  min-height: 34px;
+}
+
+.admin-enquiries__archive:hover:not(:disabled) {
+  background: var(--ad-green);
+  color: var(--ad-paper);
+}
+
 .admin-enquiries__detail-actions {
   display: flex;
   align-items: flex-end;
@@ -44,5 +135,19 @@
 
   .admin-enquiries__delete {
     width: 100%;
+  }
+
+  .admin-enquiries__bulk-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-enquiries__bulk-actions > * {
+    flex: 1;
+  }
+
+  .admin-enquiries__row-select {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
