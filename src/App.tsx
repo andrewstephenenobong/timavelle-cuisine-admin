@@ -10,6 +10,8 @@ import TestimonialsManager from './pages/TestimonialsManager';
 import Settings from './pages/Settings';
 import ContentManager from './pages/ContentManager';
 import Enquiries from './pages/Enquiries';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route
             element={
               <ProtectedRoute>
