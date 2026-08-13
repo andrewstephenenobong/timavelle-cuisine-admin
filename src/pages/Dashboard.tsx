@@ -1,7 +1,9 @@
 /* Timavelle admin overview: editorial workspace with a live Africa/Lagos wall clock. */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ImageIcon, InboxIcon, SettingsIcon, UtensilsCrossed } from '../components/DashboardLayout';
+import api, { type HealthResponse } from '../lib/api';
+import '../styles/health.css';
 
 const surfaces = [
   { label: 'Menu', state: 'Live data', detail: 'Keep the public menu focused.', icon: UtensilsCrossed, to: '/dashboard/menu' },
@@ -13,6 +15,16 @@ const surfaces = [
 const LAGOS_TIME_ZONE = 'Africa/Lagos';
 const lagosDateFormatter = new Intl.DateTimeFormat('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: LAGOS_TIME_ZONE });
 const lagosTimeFormatter = new Intl.DateTimeFormat('en-NG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: LAGOS_TIME_ZONE });
+const healthTimeFormatter = new Intl.DateTimeFormat('en-NG', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: LAGOS_TIME_ZONE });
+
+type HealthState = 'loading' | 'connected' | 'degraded' | 'offline';
+
+const healthCopy: Record<HealthState, { label: string; title: string; detail: string; width: string }> = {
+  loading: { label: 'Checking', title: 'Checking the workspace connection.', detail: 'Confirming API and database readiness now.', width: '35%' },
+  connected: { label: 'Connected', title: 'Content and conversations are connected.', detail: 'The API and database are responding. Published content and enquiries are available.', width: '100%' },
+  degraded: { label: 'Degraded', title: 'The workspace is partially available.', detail: 'The API responded, but the database is not ready. Publishing and enquiry updates may be unavailable.', width: '55%' },
+  offline: { label: 'Offline', title: 'The backend is not responding.', detail: 'The public site may still show fallback content, but admin changes cannot be confirmed until the connection returns.', width: '15%' },
+};
 
 function useLagosClock() {
   const [now, setNow] = useState(() => new Date());
@@ -62,6 +74,38 @@ function LagosWallClock({ clock }: { clock: ReturnType<typeof useLagosClock> }) 
 export default function Dashboard() {
   const clock = useLagosClock();
   const greeting = clock.hour < 12 ? 'Good morning' : clock.hour < 18 ? 'Good afternoon' : 'Good evening';
+  const [healthState, setHealthState] = useState<HealthState>('loading');
+  const [healthMessage, setHealthMessage] = useState(healthCopy.loading.detail);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
+  const [checkingHealth, setCheckingHealth] = useState(false);
+
+  const checkHealth = useCallback(async () => {
+    setCheckingHealth(true);
+    setHealthState('loading');
+    setHealthMessage(healthCopy.loading.detail);
+    try {
+      const response = await api.get<HealthResponse>('/api/health', { timeout: 8000 });
+      const nextState: HealthState = response.data.status === 'ok' && response.data.database === 'ready' ? 'connected' : 'degraded';
+      setHealthState(nextState);
+      setHealthMessage(response.data.message || healthCopy[nextState].detail);
+    } catch (error: unknown) {
+      const response = typeof error === 'object' && error !== null && 'response' in error
+        ? (error as { response?: { data?: HealthResponse } }).response
+        : undefined;
+      const backendState = response?.data?.status === 'degraded' ? 'degraded' : 'offline';
+      setHealthState(backendState);
+      setHealthMessage(response?.data?.message || healthCopy[backendState].detail);
+    } finally {
+      setLastChecked(new Date().toISOString());
+      setCheckingHealth(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void Promise.resolve().then(() => checkHealth());
+  }, [checkHealth]);
+
+  const currentHealth = healthCopy[healthState];
 
   return (
     <div className="admin-page">
@@ -78,7 +122,7 @@ export default function Dashboard() {
         <section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><InboxIcon size={16} /></span><span className="admin-activity__copy"><strong>Enquiry inbox</strong><small>Track, qualify, and follow up leads</small></span><span className="admin-activity__time">Live</span></div></div></section>
         <section className="admin-card"><div className="admin-card__eyebrow">Lead workflow</div><h3>Every request has a next step.</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Follow up from one inbox.</strong>Review new enquiries, add internal notes, and move each request from first contact to closed.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/enquiries">Open enquiry inbox ↗</Link></section>
       </div>
-      <section className="admin-card admin-status-card"><div className="admin-card__eyebrow">Workspace health</div><h3>Content and conversations are connected.</h3><p>Published content is synced with the public site, and every new enquiry now has an operational home.</p><div className="admin-status-bar"><span /></div></section>
+      <section className="admin-card admin-status-card" data-health-state={healthState} aria-live="polite"><div className="admin-status-card__topline"><div className="admin-card__eyebrow">Workspace health</div><span className="admin-health-badge">{currentHealth.label}</span></div><h3>{currentHealth.title}</h3><p>{healthMessage}</p><div className="admin-status-bar" aria-hidden="true"><span style={{ width: currentHealth.width }} /></div><div className="admin-status-card__footer"><span>{lastChecked ? `Last checked ${healthTimeFormatter.format(new Date(lastChecked))} WAT` : 'Checking live status…'}</span><button type="button" className="admin-status-card__retry" onClick={() => void checkHealth()} disabled={checkingHealth}>{checkingHealth ? 'Checking…' : 'Retry connection ↗'}</button></div></section>
     </div>
   );
 }
