@@ -1,0 +1,9 @@
+/* QA accessibility overrides: keep the editorial palette while meeting readable contrast on the paper login panel. */
+.admin-login__form-wrap > .admin-login__eyebrow,
+.admin-login__password button {
+  color: #7c3f24;
+}
+
+.admin-login__form-wrap h2 em {
+  color: #7a6500;
+}

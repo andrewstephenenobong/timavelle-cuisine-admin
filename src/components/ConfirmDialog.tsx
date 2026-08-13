@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 interface ConfirmDialogProps {
   open: boolean;
   title: string;
@@ -17,6 +19,39 @@ export default function ConfirmDialog({
   onCancel,
   onConfirm,
 }: ConfirmDialogProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    cancelRef.current?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !busy) {
+        onCancel();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [busy, onCancel, open]);
+
   if (!open) return null;
 
   return (
@@ -26,11 +61,9 @@ export default function ConfirmDialog({
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !busy) onCancel();
       }}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape' && !busy) onCancel();
-      }}
     >
       <div
+        ref={dialogRef}
         className="w-full max-w-md rounded-2xl bg-ivory p-6 shadow-2xl"
         role="dialog"
         aria-modal="true"
@@ -47,6 +80,7 @@ export default function ConfirmDialog({
         <div className="mt-6 flex justify-end gap-3">
           <button
             type="button"
+            ref={cancelRef}
             onClick={onCancel}
             disabled={busy}
             className="rounded-full border border-stone/30 px-5 py-2 font-utility text-xs text-stone hover:bg-stone/10 disabled:cursor-not-allowed disabled:opacity-50"
@@ -55,7 +89,6 @@ export default function ConfirmDialog({
           </button>
           <button
             type="button"
-            autoFocus
             onClick={onConfirm}
             disabled={busy}
             className="rounded-full bg-red-600 px-5 py-2 font-utility text-xs text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"

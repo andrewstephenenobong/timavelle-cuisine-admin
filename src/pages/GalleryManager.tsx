@@ -173,7 +173,7 @@ export default function GalleryManager() {
             <div key={image._id} className="overflow-hidden rounded-2xl bg-white shadow">
               <img src={image.imageUrl} alt={image.caption || image.category} className="h-40 w-full object-cover" />
               <div className="p-4">
-                <p className="font-utility text-xs uppercase tracking-wide text-stone/70">{image.category}</p>
+                <p className="font-utility text-xs uppercase tracking-wide text-stone">{image.category}</p>
                 {image.caption && <p className="mt-1 font-body text-sm text-stone">{image.caption}</p>}
                 <div className="mt-3 flex gap-2">
                   <button
@@ -185,7 +185,7 @@ export default function GalleryManager() {
                   <button
                     onClick={() => setPendingDelete(image)}
                     disabled={deletingId === image._id}
-                    className="rounded-full border border-red-400 px-3 py-1 font-utility text-xs text-red-500 hover:bg-red-500 hover:text-white"
+                    className="rounded-full border border-red-400 px-3 py-1 font-utility text-xs text-red-500 hover:bg-red-700 hover:text-white"
                   >
                     Delete
                   </button>

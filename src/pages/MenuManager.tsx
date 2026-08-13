@@ -210,14 +210,14 @@ export default function MenuManager() {
             <div key={item._id} className="flex items-start justify-between gap-4 rounded-2xl bg-white p-5 shadow">
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-display text-lg font-semibold text-ink">{item.name}</h4>
+                  <h3 className="font-display text-lg font-semibold text-ink">{item.name}</h3>
                   {item.featured && (
                     <span className="rounded-full bg-gold/20 px-2 py-0.5 font-utility text-xs text-emerald-deep">
                       Featured
                     </span>
                   )}
                 </div>
-                <p className="font-utility text-xs uppercase tracking-wide text-stone/70">{item.category}</p>
+                <p className="font-utility text-xs uppercase tracking-wide text-stone">{item.category}</p>
                 <p className="mt-1 font-body text-sm text-stone">{item.description}</p>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -230,7 +230,7 @@ export default function MenuManager() {
                 <button
                   onClick={() => setPendingDelete(item)}
                   disabled={deletingId === item._id}
-                  className="rounded-full border border-red-400 px-4 py-1.5 font-utility text-xs text-red-500 hover:bg-red-500 hover:text-white"
+                  className="rounded-full border border-red-400 px-4 py-1.5 font-utility text-xs text-red-500 hover:bg-red-700 hover:text-white"
                 >
                   Delete
                 </button>
