@@ -1,5 +1,5 @@
-/* Timavelle content studio: editorial local drafts for static pages until matching backend resources exist. FAQ copy mirrors the public Next.js accordion. */
-import { useState } from 'react';
+/* Timavelle content studio: read-only by default, with an explicit Edit → Save/Cancel workflow. FAQ copy mirrors the public Next.js accordion. */
+import { useEffect, useState } from 'react';
 import './content-manager.css';
 
 type ContentKind = 'services' | 'faqs' | 'contact';
@@ -45,31 +45,75 @@ function readDraft(kind: ContentKind) {
   }
 }
 
+const cloneItems = (items: DraftItem[]) => items.map((item) => ({ ...item }));
+
 export default function ContentManager({ kind }: { kind: ContentKind }) {
   const meta = contentMeta[kind];
   const [items, setItems] = useState<DraftItem[]>(() => readDraft(kind));
+  const [editingItems, setEditingItems] = useState<DraftItem[]>(() => cloneItems(readDraft(kind)));
+  const [isEditing, setIsEditing] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    const nextItems = readDraft(kind);
+    setItems(nextItems);
+    setEditingItems(cloneItems(nextItems));
+    setIsEditing(false);
+    setSaved(false);
+  }, [kind]);
+
+  function beginEdit() {
+    setEditingItems(cloneItems(items));
+    setIsEditing(true);
+    setSaved(false);
+  }
+
+  function cancelEdit() {
+    setEditingItems(cloneItems(items));
+    setIsEditing(false);
+    setSaved(false);
+  }
+
   function updateItem(id: string, field: 'title' | 'body', value: string) {
-    setItems((current) => current.map((item) => item.id === id ? { ...item, [field]: value } : item));
+    setEditingItems((current) => current.map((item) => item.id === id ? { ...item, [field]: value } : item));
     setSaved(false);
   }
 
   function addItem() {
-    setItems((current) => [...current, { id: `${kind}-${Date.now()}`, title: 'New content block', body: 'Write the public-facing content here.' }]);
+    setEditingItems((current) => [...current, { id: `${kind}-${Date.now()}`, title: 'New content block', body: 'Write the public-facing content here.' }]);
     setSaved(false);
   }
 
   function removeItem(id: string) {
-    setItems((current) => current.filter((item) => item.id !== id));
+    setEditingItems((current) => current.filter((item) => item.id !== id));
     setSaved(false);
   }
 
   function saveDraft() {
+    const nextItems = cloneItems(editingItems);
     const storageKey = kind === 'faqs' ? 'timavelle-draft-faqs-v2' : `timavelle-draft-${kind}`;
-    window.localStorage.setItem(storageKey, JSON.stringify(items));
+    window.localStorage.setItem(storageKey, JSON.stringify(nextItems));
+    setItems(nextItems);
+    setEditingItems(cloneItems(nextItems));
+    setIsEditing(false);
     setSaved(true);
   }
 
-  return <div className="content-studio"><div className="content-studio__head"><div><div className="admin-page__eyebrow">{meta.eyebrow}</div><h2>{meta.label} <em>studio.</em></h2><p className="admin-page__intro">{meta.description}</p></div><div className="content-studio__head-actions"><span className="content-studio__draft-status">{saved ? 'Draft saved in this browser' : 'Local preview draft'}</span><button className="admin-action" onClick={saveDraft}>Save draft ↗</button></div></div><div className="content-studio__notice"><span className="content-studio__notice-mark">i</span><div><strong>Editorial draft mode</strong><p>{meta.note} These edits are saved in this browser only until the backend exposes a matching content resource.</p></div><button className="content-studio__publish" disabled title="Requires a backend content endpoint">Publish locked</button></div><div className="content-studio__toolbar"><div><span className="admin-page__eyebrow">{items.length.toString().padStart(2, '0')} blocks in this page</span><h3>Build the public surface.</h3></div><button className="content-studio__add" onClick={addItem}>+ Add block</button></div><div className="content-studio__grid">{items.map((item, index) => <article className="content-studio__card" key={item.id}><div className="content-studio__card-top"><span>0{index + 1}</span><button className="content-studio__remove" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.title}`}>Remove</button></div><label>Title<input value={item.title} onChange={(event) => updateItem(item.id, 'title', event.target.value)} /></label><label>Public copy<textarea value={item.body} onChange={(event) => updateItem(item.id, 'body', event.target.value)} rows={4} /></label></article>)}</div><div className="content-studio__footer"><span>Next step: expose <code>/api/{kind}</code> in the backend to make this page publishable.</span><button className="content-studio__add" onClick={addItem}>Add another block</button></div></div>;
+  const displayedItems = isEditing ? editingItems : items;
+
+  return (
+    <div className="content-studio">
+      <div className="content-studio__head">
+        <div><div className="admin-page__eyebrow">{meta.eyebrow}</div><h2>{meta.label} <em>studio.</em></h2><p className="admin-page__intro">{meta.description}</p></div>
+        <div className="content-studio__head-actions">
+          <span className="content-studio__draft-status">{saved ? 'Draft saved in this browser' : isEditing ? 'Unsaved local changes' : 'Read-only preview'}</span>
+          {isEditing ? <div className="content-studio__edit-tools"><button className="content-studio__cancel" onClick={cancelEdit}>Cancel</button><button className="content-studio__save" onClick={saveDraft}>Save draft ↗</button></div> : <button className="content-studio__edit" onClick={beginEdit}>Edit content</button>}
+        </div>
+      </div>
+      <div className="content-studio__notice"><span className="content-studio__notice-mark">i</span><div><strong>{isEditing ? 'Editing locally' : 'Read-only content preview'}</strong><p>{meta.note} {isEditing ? 'Save your draft or cancel to discard these changes.' : 'Choose Edit content before changing any field.'}</p></div><button className="content-studio__publish" disabled title="Requires a backend content endpoint">Publish locked</button></div>
+      <div className="content-studio__toolbar"><div><span className="admin-page__eyebrow">{displayedItems.length.toString().padStart(2, '0')} blocks in this page</span><h3>Build the public surface.</h3></div>{isEditing && <button className="content-studio__add" onClick={addItem}>+ Add block</button>}</div>
+      <div className="content-studio__grid">{displayedItems.map((item, index) => <article className="content-studio__card" data-editing={isEditing} key={item.id}><div className="content-studio__card-top"><span>0{index + 1}</span>{isEditing && <button className="content-studio__remove" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.title}`}>Remove</button>}</div>{isEditing ? <><label>Title<input value={item.title} onChange={(event) => updateItem(item.id, 'title', event.target.value)} /></label><label>Public copy<textarea value={item.body} onChange={(event) => updateItem(item.id, 'body', event.target.value)} rows={4} /></label></> : <><div className="content-studio__field"><span>Title</span><strong>{item.title}</strong></div><div className="content-studio__field"><span>Public copy</span><p>{item.body}</p></div></>}</article>)}</div>
+      <div className="content-studio__footer"><span>Next step: expose <code>/api/{kind}</code> in the backend to make this page publishable.</span>{isEditing && <button className="content-studio__add" onClick={addItem}>Add another block</button>}</div>
+    </div>
+  );
 }
