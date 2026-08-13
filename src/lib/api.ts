@@ -40,4 +40,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 && !String(error.config?.url || '').includes('/api/auth/login')) {
+      localStorage.removeItem('adminToken');
+      window.dispatchEvent(new Event('admin-auth-expired'));
+    }
+    return Promise.reject(error);
+  },
+);
+
 export default api;
