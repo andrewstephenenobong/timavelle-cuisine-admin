@@ -1,0 +1,48 @@
+/* Enquiry inbox deletion: keep the destructive action visible, explicit, and usable on narrow screens. */
+.admin-enquiries__detail-actions {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-enquiries__delete {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(165, 60, 48, 0.46);
+  background: transparent;
+  color: #8d3027;
+  cursor: pointer;
+  font: 9px var(--font-utility);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-enquiries__delete:hover:not(:disabled) {
+  background: #8d3027;
+  color: var(--ad-paper);
+}
+
+.admin-enquiries__delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.admin-enquiries__notice {
+  margin-bottom: 14px;
+  padding: 13px 16px;
+  border: 1px solid rgba(13, 91, 69, 0.28);
+  background: rgba(13, 91, 69, 0.08);
+  color: var(--ad-green);
+  font: 12px var(--font-body);
+}
+
+@media (max-width: 560px) {
+  .admin-enquiries__detail-actions {
+    align-items: flex-start;
+  }
+
+  .admin-enquiries__delete {
+    width: 100%;
+  }
+}
