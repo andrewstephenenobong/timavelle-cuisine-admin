@@ -126,7 +126,9 @@ export default function TestimonialsManager() {
           <h3 className="mb-4 font-display text-lg font-semibold text-ink">
             {editingId ? 'Edit Testimonial' : 'New Testimonial'}
           </h3>
+          <label htmlFor="testimonial-client" className="sr-only">Client name</label>
           <input
+            id="testimonial-client"
             value={form.clientName}
             onChange={(e) => setForm({ ...form, clientName: e.target.value })}
             placeholder="Client name"
@@ -135,7 +137,9 @@ export default function TestimonialsManager() {
             className="w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
           />
           {formErrors.clientName && <p id="testimonial-client-error" className="mt-1 text-xs text-red-600">{formErrors.clientName}</p>}
+          <label htmlFor="testimonial-quote" className="sr-only">Approved testimonial quote</label>
           <textarea
+            id="testimonial-quote"
             value={form.quote}
             onChange={(e) => setForm({ ...form, quote: e.target.value })}
             placeholder="Quote"
@@ -145,7 +149,9 @@ export default function TestimonialsManager() {
             className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
           />
           {formErrors.quote && <p id="testimonial-quote-error" className="mt-1 text-xs text-red-600">{formErrors.quote}</p>}
+          <label htmlFor="testimonial-event" className="sr-only">Event type</label>
           <input
+            id="testimonial-event"
             value={form.eventType}
             onChange={(e) => setForm({ ...form, eventType: e.target.value })}
             placeholder="Event type (optional, e.g. Private dinner)"
@@ -153,6 +159,7 @@ export default function TestimonialsManager() {
           />
           <label className="mt-4 flex items-center gap-2 font-body text-sm text-stone">
             <input
+              id="testimonial-featured"
               type="checkbox"
               checked={form.featured}
               onChange={(e) => setForm({ ...form, featured: e.target.checked })}

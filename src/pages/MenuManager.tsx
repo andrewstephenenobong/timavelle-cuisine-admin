@@ -137,7 +137,9 @@ export default function MenuManager() {
           </h3>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-1">
+              <label htmlFor="menu-name" className="sr-only">Dish name</label>
               <input
+                id="menu-name"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Name"
@@ -148,7 +150,9 @@ export default function MenuManager() {
               {formErrors.name && <p id="menu-name-error" className="text-xs text-red-600">{formErrors.name}</p>}
             </div>
             <div className="grid gap-1">
+              <label htmlFor="menu-category" className="sr-only">Dish category</label>
               <input
+                id="menu-category"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
                 placeholder="Category"
@@ -159,7 +163,9 @@ export default function MenuManager() {
               {formErrors.category && <p id="menu-category-error" className="text-xs text-red-600">{formErrors.category}</p>}
             </div>
           </div>
+          <label htmlFor="menu-description" className="sr-only">Dish description</label>
           <textarea
+            id="menu-description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             placeholder="Description"
@@ -173,8 +179,9 @@ export default function MenuManager() {
             <ImageUploadField value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
           </div>
           <label className="mt-4 flex items-center gap-2 font-body text-sm text-stone">
-            <input
-              type="checkbox"
+              <input
+                id="menu-featured"
+                type="checkbox"
               checked={form.featured}
               onChange={(e) => setForm({ ...form, featured: e.target.checked })}
             />
