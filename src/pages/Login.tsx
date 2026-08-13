@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import './login.css';
 import { PUBLIC_SITE_URL } from '../lib/site';
 
@@ -24,8 +24,11 @@ export default function Login() {
       const res = await api.post('/api/auth/login', { email, password });
       login(res.data.token);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Something went wrong logging in.');
+    } catch (err: unknown) {
+      const response = typeof err === 'object' && err !== null && 'response' in err
+        ? (err as { response?: { data?: { error?: string } } }).response
+        : undefined;
+      setError(response?.data?.error || 'Something went wrong logging in.');
     } finally {
       setLoading(false);
     }

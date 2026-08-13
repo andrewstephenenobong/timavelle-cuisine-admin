@@ -35,7 +35,8 @@ export default function MenuManager() {
   }
 
   useEffect(() => {
-    fetchItems();
+    const timer = window.setTimeout(() => { void fetchItems(); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   function openCreateForm() {

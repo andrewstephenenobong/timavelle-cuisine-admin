@@ -9,6 +9,7 @@ import GalleryManager from './pages/GalleryManager';
 import TestimonialsManager from './pages/TestimonialsManager';
 import Settings from './pages/Settings';
 import ContentManager from './pages/ContentManager';
+import Enquiries from './pages/Enquiries';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/dashboard/menu" element={<MenuManager />} />
             <Route path="/dashboard/gallery" element={<GalleryManager />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManager />} />
+            <Route path="/dashboard/enquiries" element={<Enquiries />} />
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
             <Route path="/dashboard/faqs" element={<ContentManager kind="faqs" />} />
             <Route path="/dashboard/contact" element={<ContentManager kind="contact" />} />
