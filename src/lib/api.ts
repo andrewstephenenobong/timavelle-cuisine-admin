@@ -32,6 +32,14 @@ export interface EnquiryListResponse {
   pages: number;
 }
 
+export interface HealthResponse {
+  status: 'ok' | 'degraded';
+  database: 'ready' | 'connecting' | 'unavailable';
+  uptimeSeconds?: number;
+  checkedAt?: string;
+  message?: string;
+}
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
   if (token) {

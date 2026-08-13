@@ -1,0 +1,76 @@
+/* Timavelle health card: honest connection state, restrained status color, and a reachable retry action. */
+.admin-status-card__topline,
+.admin-status-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-health-badge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid rgba(247, 245, 240, 0.24);
+  color: var(--ad-paper);
+  font: 9px var(--font-utility);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-status-card[data-health-state='connected'] .admin-health-badge {
+  border-color: var(--ad-gold);
+  color: var(--ad-gold);
+}
+
+.admin-status-card[data-health-state='degraded'] .admin-health-badge {
+  border-color: #f0c45a;
+  color: #f0c45a;
+}
+
+.admin-status-card[data-health-state='offline'] .admin-health-badge {
+  border-color: #f3a49a;
+  color: #f3a49a;
+}
+
+.admin-status-card__footer {
+  margin-top: 15px;
+  color: rgba(247, 245, 240, 0.62);
+  font: 9px var(--font-utility);
+  letter-spacing: 0.04em;
+}
+
+.admin-status-card__retry {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(247, 245, 240, 0.32);
+  background: transparent;
+  color: var(--ad-paper);
+  cursor: pointer;
+  font: 9px var(--font-utility);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-status-card__retry:hover:not(:disabled) {
+  border-color: var(--ad-gold);
+  color: var(--ad-gold);
+}
+
+.admin-status-card__retry:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+@media (max-width: 680px) {
+  .admin-status-card__topline,
+  .admin-status-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-status-card__retry {
+    width: 100%;
+  }
+}

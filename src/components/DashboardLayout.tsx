@@ -90,7 +90,7 @@ export default function DashboardLayout() {
         <div className="admin-shell__divider" />
         <div className="admin-shell__label">System</div>
         <a className="admin-shell__nav" href="mailto:hello@timavellecuisine.com" style={{ textDecoration: 'none' }}><span style={{ color: 'rgba(247,245,240,.62)' }}>?</span>Help centre</a>
-        <div className="admin-shell__bottom"><div className="admin-shell__status">API connection live<small>Drafts and enquiries synced</small></div><button className="admin-shell__logout" onClick={handleLogout}><LogOut size={17} />Log out</button></div>
+        <div className="admin-shell__bottom"><div className="admin-shell__status">Health monitored<small>See Overview for live status</small></div><button className="admin-shell__logout" onClick={handleLogout}><LogOut size={17} />Log out</button></div>
       </aside>
       <div className="admin-shell__main">
         <header className="admin-shell__mobilebar"><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span><button ref={mobileTriggerRef} onClick={() => setOpen(true)} aria-controls="admin-navigation" aria-label="Open navigation"><Menu size={23} /></button></header>
