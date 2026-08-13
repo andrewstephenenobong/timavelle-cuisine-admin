@@ -1,4 +1,4 @@
-/* Timavelle content studio: editorial local drafts for static pages until matching backend resources exist. */
+/* Timavelle content studio: editorial local drafts for static pages until matching backend resources exist. FAQ copy mirrors the public Next.js accordion. */
 import { useState } from 'react';
 import './content-manager.css';
 
@@ -13,9 +13,10 @@ const initialContent: Record<ContentKind, DraftItem[]> = {
     { id: 'personal-chef', title: 'Personal Chef Experience', body: 'Recurring or one-off in-home cooking shaped around your household.' },
   ],
   faqs: [
-    { id: 'booking', title: 'How far in advance should I book?', body: 'Tell us about your date and occasion as early as possible so we can shape the right experience.' },
-    { id: 'dietary', title: 'Can you accommodate dietary requirements?', body: 'Yes. Share dietary needs during the enquiry and we will build them into the menu conversation.' },
-    { id: 'travel', title: 'Do you travel for events?', body: 'We can discuss travel depending on the event format, guest count, and location.' },
+    { id: 'booking', title: 'How far in advance should I book?', body: 'For private dinners, two to three weeks is comfortable. For weddings or large events, six to eight weeks lets us plan properly, including a tasting.' },
+    { id: 'dietary', title: 'Can you accommodate dietary restrictions?', body: 'Yes — vegetarian, vegan, gluten-free, and allergy-specific menus are all things we plan for from the start, not substitute in at the last minute.' },
+    { id: 'travel', title: 'Do you travel outside Lagos?', body: 'For larger events, yes. Travel and logistics are quoted separately based on distance and event size.' },
+    { id: 'private-dining', title: 'What’s included in a private dining booking?', body: 'The chef, the full menu (tasted and agreed beforehand), service staff for the evening, and cleanup. Tableware and venue are discussed case by case.' },
   ],
   contact: [
     { id: 'address', title: 'Address', body: '14 Ilaro Crescent, Lagos' },
@@ -27,14 +28,17 @@ const initialContent: Record<ContentKind, DraftItem[]> = {
 
 const contentMeta: Record<ContentKind, { label: string; eyebrow: string; description: string; note: string }> = {
   services: { label: 'Services', eyebrow: 'Public page / 04', description: 'Shape the offers guests see when they are deciding what kind of table they want.', note: 'The public Services page is currently static in Next.js.' },
-  faqs: { label: 'FAQs', eyebrow: 'Public page / 05', description: 'Keep answers clear, compact, and ready for the moments before an enquiry.', note: 'The public FAQ accordion is currently static in Next.js.' },
+  faqs: { label: 'FAQs', eyebrow: 'Public page / 05', description: 'Keep answers clear, compact, and ready for the moments before an enquiry.', note: 'This editor mirrors the four records currently shown by the public FAQ accordion.' },
   contact: { label: 'Contact', eyebrow: 'Public page / 06', description: 'Keep the house details consistent across the public contact experience.', note: 'Contact details are currently static; enquiries are submitted through the existing form.' },
 };
 
 function readDraft(kind: ContentKind) {
   if (typeof window === 'undefined') return initialContent[kind];
   try {
-    const stored = window.localStorage.getItem(`timavelle-draft-${kind}`);
+    // The FAQ editor previously stored a three-item draft with different copy.
+    // Versioning this local key prevents stale browser data from masking the public content.
+    const storageKey = kind === 'faqs' ? 'timavelle-draft-faqs-v2' : `timavelle-draft-${kind}`;
+    const stored = window.localStorage.getItem(storageKey);
     return stored ? (JSON.parse(stored) as DraftItem[]) : initialContent[kind];
   } catch {
     return initialContent[kind];
@@ -62,7 +66,8 @@ export default function ContentManager({ kind }: { kind: ContentKind }) {
   }
 
   function saveDraft() {
-    window.localStorage.setItem(`timavelle-draft-${kind}`, JSON.stringify(items));
+    const storageKey = kind === 'faqs' ? 'timavelle-draft-faqs-v2' : `timavelle-draft-${kind}`;
+    window.localStorage.setItem(storageKey, JSON.stringify(items));
     setSaved(true);
   }
 
