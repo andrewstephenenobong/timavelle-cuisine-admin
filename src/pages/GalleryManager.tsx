@@ -128,7 +128,9 @@ export default function GalleryManager() {
           </h3>
           <ImageUploadField value={form.imageUrl} onChange={(url) => setForm({ ...form, imageUrl: url })} />
           {formErrors.imageUrl && <p className="mt-1 text-xs text-red-600" role="alert">{formErrors.imageUrl}</p>}
+          <label htmlFor="gallery-category" className="sr-only">Gallery category</label>
           <input
+            id="gallery-category"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
             placeholder="Category (e.g. Plated, Events, Kitchen)"
@@ -137,7 +139,9 @@ export default function GalleryManager() {
             className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
           />
           {formErrors.category && <p id="gallery-category-error" className="mt-1 text-xs text-red-600">{formErrors.category}</p>}
+          <label htmlFor="gallery-caption" className="sr-only">Gallery caption</label>
           <input
+            id="gallery-caption"
             value={form.caption}
             onChange={(e) => setForm({ ...form, caption: e.target.value })}
             placeholder="Caption (optional)"

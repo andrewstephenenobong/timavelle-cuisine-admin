@@ -41,7 +41,8 @@ export default function Login() {
     try {
       const res = await api.post('/api/auth/login', { email, password });
       login(res.data.token);
-      navigate('/dashboard');
+      const destination = typeof location.state?.from === 'string' && location.state.from.startsWith('/dashboard') ? location.state.from : '/dashboard';
+      navigate(destination, { replace: true });
     } catch (err: unknown) {
       const response = typeof err === 'object' && err !== null && 'response' in err
         ? (err as { response?: { data?: { error?: string } } }).response

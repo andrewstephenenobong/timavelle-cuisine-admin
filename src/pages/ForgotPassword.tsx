@@ -6,7 +6,10 @@ import './login-a11y.css';
 
 function getErrorMessage(error: unknown) {
   if (typeof error === 'object' && error !== null && 'response' in error) {
-    return (error as { response?: { data?: { error?: string } } }).response?.data?.error || 'We could not start password recovery.';
+    const response = (error as { response?: { status?: number; data?: { error?: string } } }).response;
+    if (response?.status === 429) return 'Too many recovery attempts. Please wait 15 minutes before trying again.';
+    if (response?.status === 503) return 'Password recovery is temporarily unavailable. Please try again later.';
+    return response?.data?.error || 'We could not start password recovery.';
   }
   return 'We could not start password recovery.';
 }
