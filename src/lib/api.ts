@@ -20,6 +20,8 @@ export interface EnquiryRecord {
   status: EnquiryStatus;
   internalNotes: string;
   lastContactedAt?: string;
+  archivedAt?: string;
+  archivedBy?: string;
   createdAt: string;
   updatedAt: string;
 }
