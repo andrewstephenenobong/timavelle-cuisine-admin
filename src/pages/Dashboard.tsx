@@ -1,12 +1,12 @@
 /* Timavelle admin overview: editorial workspace with a live Africa/Lagos wall clock. */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ImageIcon, Quote, SettingsIcon, UtensilsCrossed } from '../components/DashboardLayout';
+import { ImageIcon, InboxIcon, SettingsIcon, UtensilsCrossed } from '../components/DashboardLayout';
 
 const surfaces = [
   { label: 'Menu', state: 'Live data', detail: 'Keep the public menu focused.', icon: UtensilsCrossed, to: '/dashboard/menu' },
   { label: 'Gallery', state: 'Live data', detail: 'Shape the visual appetite.', icon: ImageIcon, to: '/dashboard/gallery' },
-  { label: 'Testimonials', state: 'Review queue', detail: 'Approve stories before publishing.', icon: Quote, to: '/dashboard/testimonials' },
+  { label: 'Enquiries', state: 'Lead inbox', detail: 'Follow up every request.', icon: InboxIcon, to: '/dashboard/enquiries' },
   { label: 'Settings', state: 'Workspace setup', detail: 'Security and site controls.', icon: SettingsIcon, to: '/dashboard/settings' },
 ];
 
@@ -75,10 +75,10 @@ export default function Dashboard() {
       </div>
       <div className="admin-stat-grid">{surfaces.map((surface) => <Link key={surface.label} to={surface.to} className="admin-stat" style={{ textDecoration: 'none' }}><span className="admin-stat__label">{surface.label}</span><strong>{surface.state}</strong><small>{surface.detail}</small></Link>)}</div>
       <div className="admin-card-grid">
-        <section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><Quote size={16} /></span><span className="admin-activity__copy"><strong>Testimonial review</strong><small>Use the content queue before publishing</small></span><span className="admin-activity__time">Review</span></div></div></section>
-        <section className="admin-card"><div className="admin-card__eyebrow">Next to consider</div><h3>Lead workflow</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Connect the enquiry path.</strong>The public form already has a clear place in the experience. Connect the existing API before treating this workspace as live.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/settings">Review settings ↗</Link></section>
+        <section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><InboxIcon size={16} /></span><span className="admin-activity__copy"><strong>Enquiry inbox</strong><small>Track, qualify, and follow up leads</small></span><span className="admin-activity__time">Live</span></div></div></section>
+        <section className="admin-card"><div className="admin-card__eyebrow">Lead workflow</div><h3>Every request has a next step.</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Follow up from one inbox.</strong>Review new enquiries, add internal notes, and move each request from first contact to closed.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/enquiries">Open enquiry inbox ↗</Link></section>
       </div>
-      <section className="admin-card admin-status-card"><div className="admin-card__eyebrow">Workspace health</div><h3>Everything is staged for a more considered table.</h3><p>Your content surfaces are organized. Connect the API before publishing live changes.</p><div className="admin-status-bar"><span /></div></section>
+      <section className="admin-card admin-status-card"><div className="admin-card__eyebrow">Workspace health</div><h3>Content and conversations are connected.</h3><p>Published content is synced with the public site, and every new enquiry now has an operational home.</p><div className="admin-status-bar"><span /></div></section>
     </div>
   );
 }

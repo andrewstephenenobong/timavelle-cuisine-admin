@@ -33,7 +33,8 @@ export default function TestimonialsManager() {
   }
 
   useEffect(() => {
-    fetchTestimonials();
+    const timer = window.setTimeout(() => { void fetchTestimonials(); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   function openCreateForm() {

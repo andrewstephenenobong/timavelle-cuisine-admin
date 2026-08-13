@@ -33,7 +33,8 @@ export default function GalleryManager() {
   }
 
   useEffect(() => {
-    fetchImages();
+    const timer = window.setTimeout(() => { void fetchImages(); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   function openCreateForm() {
