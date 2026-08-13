@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
+import ConfirmDialog from '../components/ConfirmDialog';
 import ImageUploadField from '../components/ImageUploadField';
 
 interface GalleryImage {
@@ -10,6 +11,7 @@ interface GalleryImage {
 }
 
 const emptyForm = { imageUrl: '', caption: '', category: '' };
+type GalleryFormErrors = Partial<Record<'imageUrl' | 'category', string>>;
 
 export default function GalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -19,14 +21,20 @@ export default function GalleryManager() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [formErrors, setFormErrors] = useState<GalleryFormErrors>({});
+  const [pendingDelete, setPendingDelete] = useState<GalleryImage | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   async function fetchImages() {
     setLoading(true);
+    setLoadFailed(false);
     try {
       const res = await api.get('/api/gallery');
       setImages(res.data.images);
     } catch {
       setError('Could not load gallery images.');
+      setLoadFailed(true);
     } finally {
       setLoading(false);
     }
@@ -39,20 +47,30 @@ export default function GalleryManager() {
 
   function openCreateForm() {
     setForm(emptyForm);
+    setFormErrors({});
     setEditingId(null);
     setShowForm(true);
   }
 
   function openEditForm(image: GalleryImage) {
     setForm({ imageUrl: image.imageUrl, caption: image.caption || '', category: image.category });
+    setFormErrors({});
     setEditingId(image._id);
     setShowForm(true);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const nextErrors: GalleryFormErrors = {};
+    if (!form.imageUrl.trim()) nextErrors.imageUrl = 'Upload an image before saving this gallery item.';
+    if (!form.category.trim()) nextErrors.category = 'Add a category so the gallery can be filtered.';
+    if (Object.keys(nextErrors).length) {
+      setFormErrors(nextErrors);
+      return;
+    }
     setSaving(true);
     setError('');
+    setFormErrors({});
     try {
       if (editingId) {
         await api.put(`/api/gallery/${editingId}`, form);
@@ -68,13 +86,19 @@ export default function GalleryManager() {
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Delete this image? This cannot be undone.')) return;
+  async function handleDelete() {
+    if (!pendingDelete) return;
+    const id = pendingDelete._id;
+    setDeletingId(id);
+    setError('');
     try {
       await api.delete(`/api/gallery/${id}`);
+      setPendingDelete(null);
       await fetchImages();
     } catch {
       setError('Something went wrong deleting this image.');
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -90,21 +114,29 @@ export default function GalleryManager() {
         </button>
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+          <span>{error}</span>
+          {loadFailed && <button type="button" onClick={() => void fetchImages()} className="font-utility text-xs underline">Retry loading</button>}
+        </div>
+      )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="mb-8 rounded-3xl bg-white p-6 shadow-lg">
+        <form onSubmit={handleSubmit} noValidate className="mb-8 rounded-3xl bg-white p-6 shadow-lg">
           <h3 className="mb-4 font-display text-lg font-semibold text-ink">
             {editingId ? 'Edit Image' : 'New Image'}
           </h3>
           <ImageUploadField value={form.imageUrl} onChange={(url) => setForm({ ...form, imageUrl: url })} />
+          {formErrors.imageUrl && <p className="mt-1 text-xs text-red-600" role="alert">{formErrors.imageUrl}</p>}
           <input
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
             placeholder="Category (e.g. Plated, Events, Kitchen)"
-            required
+            aria-invalid={Boolean(formErrors.category)}
+            aria-describedby={formErrors.category ? 'gallery-category-error' : undefined}
             className="mt-4 w-full rounded-xl border border-stone/20 px-4 py-2 font-body"
           />
+          {formErrors.category && <p id="gallery-category-error" className="mt-1 text-xs text-red-600">{formErrors.category}</p>}
           <input
             value={form.caption}
             onChange={(e) => setForm({ ...form, caption: e.target.value })}
@@ -151,7 +183,8 @@ export default function GalleryManager() {
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDelete(image._id)}
+                    onClick={() => setPendingDelete(image)}
+                    disabled={deletingId === image._id}
                     className="rounded-full border border-red-400 px-3 py-1 font-utility text-xs text-red-500 hover:bg-red-500 hover:text-white"
                   >
                     Delete
@@ -162,6 +195,14 @@ export default function GalleryManager() {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Delete this gallery image?"
+        message="This removes the image from the admin gallery and cannot be undone from this screen."
+        busy={Boolean(deletingId)}
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => void handleDelete()}
+      />
     </div>
   );
 }
