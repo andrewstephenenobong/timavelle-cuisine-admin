@@ -41,7 +41,7 @@ export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
-  const handleLogout = () => { logout(); navigate('/login'); };
+  const handleLogout = () => { logout(); navigate('/login', { replace: true, state: { loggedOut: true } }); };
   const currentLabel = navItems.find((item) => location.pathname === item.to)?.label ?? navItems.find((item) => location.pathname.startsWith(`${item.to}/`))?.label ?? 'Overview';
 
   useEffect(() => {

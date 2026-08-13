@@ -31,6 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function logout() {
     localStorage.removeItem('adminToken');
+    sessionStorage.clear();
+    window.dispatchEvent(new Event('admin-logout'));
     setToken(null);
   }
 
