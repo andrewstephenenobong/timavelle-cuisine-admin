@@ -135,8 +135,8 @@ export default function ContentManager({ kind }: { kind: ContentKind }) {
     try {
       const endpoint = API_ENDPOINTS[kind];
       if (kind === 'contact') await api.post(`${endpoint}/publish`);
-      else for (const item of items) if (item.serverId) await api.post(`${endpoint}/${item.serverId}/publish`);
-      setSaved(false); setStatus('Published to the public site');
+      else await api.post(`${endpoint}/publish-batch`, { ids: items.map((item) => item.serverId).filter((id): id is string => Boolean(id)) });
+      setSaved(false); setStatus('Published atomically to the public site');
     } catch (publishError) {
       setError(apiErrorMessage(publishError));
       setStatus('Publish failed');
