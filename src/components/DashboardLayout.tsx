@@ -13,6 +13,7 @@ const IconBase = ({ children, size = 18 }: { children: ReactNode; size?: number 
 export const LayoutDashboard = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="3" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="14" y="3" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="3" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /><rect x="14" y="14" width="7" height="7" stroke="currentColor" strokeWidth="1.5" /></IconBase>;
 export const UtensilsCrossed = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M7 2l5 10M12 2l-5 10M7 12h10M7 18h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
 export const ImageIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" /><circle cx="8.5" cy="10.5" r="1.5" fill="currentColor" /><path d="M21 19l-6-6-4 4-3-3-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
+export const PhotoIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.5" /><circle cx="9" cy="9" r="1.6" stroke="currentColor" strokeWidth="1.5" /><path d="M5 17l4.5-4.5 3.5 3 2.5-2.5L19 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const Quote = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M7 7h3v6H5V9a2 2 0 012-2zM14 7h3v6h-5V9a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const InboxIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M4 5h16v11H4zM4 12h4l2 3h4l2-3h4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M8 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
 export const SettingsIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M19 13a7 7 0 000-2l2-1-2-3-2 1a7 7 0 00-2-1l-.3-2h-3.5L11 7a7 7 0 00-2 1L7 7 5 10l2 1a7 7 0 000 2l-2 1 2 3 2-1a7 7 0 002 1l.3 2h3.5l.3-2a7 7 0 002-1l2 1 2-3-2-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></IconBase>;
@@ -24,6 +25,7 @@ const navItems = [
   { label: 'Overview', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
   { label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
+  { label: 'Hero image', to: '/dashboard/hero-image', icon: PhotoIcon },
   { label: 'Testimonials', to: '/dashboard/testimonials', icon: Quote },
   { label: 'Enquiries', to: '/dashboard/enquiries', icon: InboxIcon },
   { label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },
@@ -39,10 +41,33 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [quickMenuOpen, setQuickMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
   const handleLogout = () => { logout(); navigate('/login', { replace: true, state: { loggedOut: true } }); };
   const currentLabel = navItems.find((item) => location.pathname === item.to)?.label ?? navItems.find((item) => location.pathname.startsWith(`${item.to}/`))?.label ?? 'Overview';
+
+  useEffect(() => {
+    if (!quickMenuOpen && !notificationsOpen) return undefined;
+    const closePanels = (event: MouseEvent) => {
+      if (event.target instanceof Element && event.target.closest('.admin-topbar__actions')) return;
+      setQuickMenuOpen(false);
+      setNotificationsOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setQuickMenuOpen(false);
+        setNotificationsOpen(false);
+      }
+    };
+    document.addEventListener('click', closePanels);
+    document.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.removeEventListener('click', closePanels);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [quickMenuOpen, notificationsOpen]);
 
   useEffect(() => {
     if (!open || !window.matchMedia('(max-width: 680px)').matches) return undefined;
@@ -94,7 +119,7 @@ export default function DashboardLayout() {
       </aside>
       <div className="admin-shell__main">
         <header className="admin-shell__mobilebar"><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span><button ref={mobileTriggerRef} onClick={() => setOpen(true)} aria-controls="admin-navigation" aria-label="Open navigation"><Menu size={23} /></button></header>
-        <div className="admin-topbar" role="region" aria-label="Workspace toolbar"><span className="admin-topbar__crumb">Timavelle / <strong>{currentLabel}</strong></span><div className="admin-topbar__actions"><button className="admin-topbar__notice" aria-label="Notifications">•</button><a className="admin-topbar__link" href={PUBLIC_SITE_URL} target="_blank" rel="noreferrer">View site ↗</a><button className="admin-topbar__link" onClick={() => setOpen(!open)} aria-controls="admin-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'}>{open ? 'Close' : 'Menu'}</button></div></div>
+        <div className="admin-topbar" role="region" aria-label="Workspace toolbar"><span className="admin-topbar__crumb">Timavelle / <strong>{currentLabel}</strong></span><div className="admin-topbar__actions"><button className="admin-topbar__notice" type="button" onClick={() => { setNotificationsOpen((current) => !current); setQuickMenuOpen(false); }} aria-label="Open workspace notifications" aria-expanded={notificationsOpen} aria-haspopup="dialog">•</button><a className="admin-topbar__link" href={PUBLIC_SITE_URL} target="_blank" rel="noreferrer">View site ↗</a><button className="admin-topbar__link" type="button" onClick={() => { setQuickMenuOpen((current) => !current); setNotificationsOpen(false); }} aria-expanded={quickMenuOpen} aria-haspopup="menu" aria-label="Open quick navigation">Menu</button>{notificationsOpen && <section className="admin-topbar__panel" role="dialog" aria-label="Workspace notifications"><span className="admin-topbar__panel-kicker">Workspace notes</span><strong>Publishing stays deliberate.</strong><p>Save a draft before publishing. The Hero image page lets you replace the public homepage picture without editing the website code.</p><Link to="/dashboard/hero-image" onClick={() => setNotificationsOpen(false)}>Open Hero image ↗</Link></section>}{quickMenuOpen && <nav className="admin-topbar__panel admin-topbar__quickmenu" aria-label="Quick navigation" role="menu"><span className="admin-topbar__panel-kicker">Jump to</span>{navItems.slice(0, 5).map((item) => <Link key={item.to} to={item.to} role="menuitem" onClick={() => setQuickMenuOpen(false)}>{item.label}</Link>)}</nav>}</div></div>
         <main><h1 className="sr-only">Timavelle Admin Workspace</h1><Outlet /></main>
       </div>
       {open && <button type="button" className="fixed inset-0 z-20 hidden bg-black/40 md:hidden" aria-label="Close navigation overlay" onClick={() => setOpen(false)} />}

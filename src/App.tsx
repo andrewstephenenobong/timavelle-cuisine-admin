@@ -12,6 +12,7 @@ import ContentManager from './pages/ContentManager';
 import Enquiries from './pages/Enquiries';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import HeroImageManager from './pages/HeroImageManager';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/menu" element={<MenuManager />} />
             <Route path="/dashboard/gallery" element={<GalleryManager />} />
+            <Route path="/dashboard/hero-image" element={<HeroImageManager />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManager />} />
             <Route path="/dashboard/enquiries" element={<Enquiries />} />
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
