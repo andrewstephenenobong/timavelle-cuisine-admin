@@ -13,6 +13,7 @@ import Enquiries from './pages/Enquiries';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import HeroImageManager from './pages/HeroImageManager';
+import AuditHistory from './pages/AuditHistory';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
             <Route path="/dashboard/faqs" element={<ContentManager kind="faqs" />} />
             <Route path="/dashboard/contact" element={<ContentManager kind="contact" />} />
+            <Route path="/dashboard/audit-history" element={<AuditHistory />} />
             <Route path="/dashboard/settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />

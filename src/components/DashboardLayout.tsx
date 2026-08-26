@@ -16,6 +16,7 @@ export const ImageIcon = ({ size = 18 }: { size?: number }) => <IconBase size={s
 export const PhotoIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.5" /><circle cx="9" cy="9" r="1.6" stroke="currentColor" strokeWidth="1.5" /><path d="M5 17l4.5-4.5 3.5 3 2.5-2.5L19 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const Quote = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M7 7h3v6H5V9a2 2 0 012-2zM14 7h3v6h-5V9a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const InboxIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M4 5h16v11H4zM4 12h4l2 3h4l2-3h4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M8 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
+export const HistoryIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M4 12a8 8 0 108-8 8.2 8.2 0 00-5.7 2.3L4 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 4v4.5h4.5M12 7v5l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const SettingsIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M19 13a7 7 0 000-2l2-1-2-3-2 1a7 7 0 00-2-1l-.3-2h-3.5L11 7a7 7 0 00-2 1L7 7 5 10l2 1a7 7 0 000 2l-2 1 2 3 2-1a7 7 0 002 1l.3 2h3.5l.3-2a7 7 0 002-1l2 1 2-3-2-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></IconBase>;
 export const LogOut = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const Menu = ({ size = 24 }: { size?: number }) => <IconBase size={size}><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
@@ -31,6 +32,7 @@ const navItems = [
   { label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },
   { label: 'FAQs', to: '/dashboard/faqs', icon: Quote },
   { label: 'Contact', to: '/dashboard/contact', icon: ImageIcon },
+  { label: 'Audit history', to: '/dashboard/audit-history', icon: HistoryIcon },
   { label: 'Settings', to: '/dashboard/settings', icon: SettingsIcon },
 ];
 
