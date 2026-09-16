@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
@@ -9,8 +9,8 @@ import GalleryManager from './pages/GalleryManager';
 import TestimonialsManager from './pages/TestimonialsManager';
 import Settings from './pages/Settings';
 import ContentManager from './pages/ContentManager';
+import ContactManager from './pages/ContactManager';
 import Enquiries from './pages/Enquiries';
-import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import HeroImageManager from './pages/HeroImageManager';
 import AuditHistory from './pages/AuditHistory';
@@ -21,7 +21,6 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route
             element={
@@ -38,7 +37,7 @@ export default function App() {
             <Route path="/dashboard/enquiries" element={<Enquiries />} />
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
             <Route path="/dashboard/faqs" element={<ContentManager kind="faqs" />} />
-            <Route path="/dashboard/contact" element={<ContentManager kind="contact" />} />
+            <Route path="/dashboard/contact" element={<ContactManager />} />
             <Route path="/dashboard/audit-history" element={<AuditHistory />} />
             <Route path="/dashboard/settings" element={<Settings />} />
           </Route>
