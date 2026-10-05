@@ -27,6 +27,7 @@ const navItems = [
   { label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
   { label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
   { label: 'Hero image', to: '/dashboard/hero-image', icon: PhotoIcon },
+  { label: 'The House image', to: '/dashboard/about-image', icon: ImageIcon },
   { label: 'Testimonials', to: '/dashboard/testimonials', icon: Quote },
   { label: 'Enquiries', to: '/dashboard/enquiries', icon: InboxIcon },
   { label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },

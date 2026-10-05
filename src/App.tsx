@@ -13,6 +13,7 @@ import ContactManager from './pages/ContactManager';
 import Enquiries from './pages/Enquiries';
 import ResetPassword from './pages/ResetPassword';
 import HeroImageManager from './pages/HeroImageManager';
+import AboutImageManager from './pages/AboutImageManager';
 import AuditHistory from './pages/AuditHistory';
 
 export default function App() {
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/dashboard/menu" element={<MenuManager />} />
             <Route path="/dashboard/gallery" element={<GalleryManager />} />
             <Route path="/dashboard/hero-image" element={<HeroImageManager />} />
+            <Route path="/dashboard/about-image" element={<AboutImageManager />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManager />} />
             <Route path="/dashboard/enquiries" element={<Enquiries />} />
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
