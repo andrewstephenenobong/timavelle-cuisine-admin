@@ -16,6 +16,7 @@ export const ImageIcon = ({ size = 18 }: { size?: number }) => <IconBase size={s
 export const PhotoIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><rect x="4" y="4" width="16" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.5" /><circle cx="9" cy="9" r="1.6" stroke="currentColor" strokeWidth="1.5" /><path d="M5 17l4.5-4.5 3.5 3 2.5-2.5L19 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const Quote = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M7 7h3v6H5V9a2 2 0 012-2zM14 7h3v6h-5V9a2 2 0 012-2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const InboxIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M4 5h16v11H4zM4 12h4l2 3h4l2-3h4" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M8 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
+export const ShoppingBagIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M6 8h12l-1 12H7L6 8z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" /><path d="M9 8V6a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
 export const HistoryIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M4 12a8 8 0 108-8 8.2 8.2 0 00-5.7 2.3L4 8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 4v4.5h4.5M12 7v5l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
 export const SettingsIcon = ({ size = 18 }: { size?: number }) => <IconBase size={size}><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" /><path d="M19 13a7 7 0 000-2l2-1-2-3-2 1a7 7 0 00-2-1l-.3-2h-3.5L11 7a7 7 0 00-2 1L7 7 5 10l2 1a7 7 0 000 2l-2 1 2 3 2-1a7 7 0 002 1l.3 2h3.5l.3-2a7 7 0 002-1l2 1 2-3-2-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></IconBase>;
 export const LogOut = ({ size = 18 }: { size?: number }) => <IconBase size={size}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></IconBase>;
@@ -25,6 +26,7 @@ export const X = ({ size = 22 }: { size?: number }) => <IconBase size={size}><pa
 const navItems = [
   { label: 'Overview', to: '/dashboard', icon: LayoutDashboard },
   { label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
+  { label: 'Orders', to: '/dashboard/orders', icon: ShoppingBagIcon },
   { label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
   { label: 'Hero image', to: '/dashboard/hero-image', icon: PhotoIcon },
   { label: 'The House image', to: '/dashboard/about-image', icon: ImageIcon },
@@ -112,7 +114,7 @@ export default function DashboardLayout() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
-            return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} data-active={active} aria-current={active ? 'page' : undefined}><Icon size={18} />{item.label}{item.label === 'Testimonials' && <span className="admin-shell__badge">Review</span>}{item.label === 'Enquiries' && <span className="admin-shell__badge admin-shell__badge--quiet">Inbox</span>}</Link>;
+            return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} data-active={active} aria-current={active ? 'page' : undefined}><Icon size={18} />{item.label}{item.label === 'Testimonials' && <span className="admin-shell__badge">Review</span>}{item.label === 'Enquiries' && <span className="admin-shell__badge admin-shell__badge--quiet">Inbox</span>}{item.label === 'Orders' && <span className="admin-shell__badge admin-shell__badge--quiet">Live</span>}</Link>;
           })}
         </nav>
         <div className="admin-shell__divider" />

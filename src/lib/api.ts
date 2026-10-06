@@ -34,6 +34,52 @@ export interface EnquiryListResponse {
   pages: number;
 }
 
+
+export const orderStatuses = ['new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] as const;
+export type OrderStatus = typeof orderStatuses[number];
+
+export interface OrderLineAddOn {
+  name: string;
+  price: number;
+}
+
+export interface OrderLine {
+  menuItemId?: string;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+  addOns: OrderLineAddOn[];
+  lineTotal: number;
+}
+
+export interface OrderRecord {
+  _id: string;
+  customerName: string;
+  customerPhone: string;
+  orderType: 'delivery' | 'pickup';
+  deliveryAddress?: string;
+  items: OrderLine[];
+  subtotal: number;
+  total: number;
+  notes?: string;
+  status: OrderStatus;
+  channel: 'whatsapp' | 'admin';
+  paymentStatus: 'unpaid' | 'paid';
+  internalNotes: string;
+  archivedAt?: string;
+  archivedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface OrderListResponse {
+  items: OrderRecord[];
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+}
+
 export interface HealthResponse {
   status: 'ok' | 'degraded';
   database: 'ready' | 'connecting' | 'unavailable';

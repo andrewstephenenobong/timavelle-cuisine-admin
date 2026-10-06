@@ -1,0 +1,18 @@
+/* Menu pricing: price field styling plus a lightweight repeatable add-ons editor. */
+.menu-pricing__card-price { color: var(--emerald-deep); font-weight: 600; }
+
+.menu-pricing__addons { display: grid; gap: .6rem; margin: 0; border: 1px solid rgba(43,69,57,.18); padding: .9rem 1rem 1.1rem; }
+.menu-pricing__addons legend { display: grid; gap: .2rem; padding: 0 .3rem; color: var(--emerald-deep); font-family: var(--font-utility); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; }
+.menu-pricing__addons legend span { color: var(--stone); font-size: .64rem; letter-spacing: normal; text-transform: none; }
+
+.menu-pricing__addon-rows { display: grid; gap: .5rem; }
+.menu-pricing__addon-row { display: grid; grid-template-columns: minmax(0,1fr) 110px auto; gap: .5rem; align-items: center; }
+.menu-pricing__addon-row input { width: 100%; min-height: 40px; border: 1px solid rgba(43,69,57,.24); background: var(--ivory); padding: .5rem .65rem; color: var(--ink); font-family: var(--font-body); font-size: .88rem; }
+.menu-pricing__addon-row button { min-height: 40px; border: 1px solid rgba(172,50,50,.4); background: transparent; padding: 0 .7rem; color: #a83434; font-family: var(--font-utility); font-size: .62rem; letter-spacing: .05em; text-transform: uppercase; }
+.menu-pricing__addon-row button:hover { background: rgba(172,50,50,.08); }
+
+.menu-pricing__add-addon { justify-self: start; min-height: 38px; border: 1px dashed rgba(43,69,57,.35); background: transparent; padding: .45rem .8rem; color: var(--emerald-deep); font-family: var(--font-utility); font-size: .64rem; letter-spacing: .06em; text-transform: uppercase; }
+.menu-pricing__add-addon span { margin-left: .3rem; }
+.menu-pricing__add-addon:hover { background: rgba(20,64,50,.06); }
+
+@media (max-width: 560px) { .menu-pricing__addon-row { grid-template-columns: 1fr; } }

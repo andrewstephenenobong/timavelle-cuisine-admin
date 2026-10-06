@@ -11,6 +11,7 @@ import Settings from './pages/Settings';
 import ContentManager from './pages/ContentManager';
 import ContactManager from './pages/ContactManager';
 import Enquiries from './pages/Enquiries';
+import Orders from './pages/Orders';
 import ResetPassword from './pages/ResetPassword';
 import HeroImageManager from './pages/HeroImageManager';
 import AboutImageManager from './pages/AboutImageManager';
@@ -37,6 +38,7 @@ export default function App() {
             <Route path="/dashboard/about-image" element={<AboutImageManager />} />
             <Route path="/dashboard/testimonials" element={<TestimonialsManager />} />
             <Route path="/dashboard/enquiries" element={<Enquiries />} />
+            <Route path="/dashboard/orders" element={<Orders />} />
             <Route path="/dashboard/services" element={<ContentManager kind="services" />} />
             <Route path="/dashboard/faqs" element={<ContentManager kind="faqs" />} />
             <Route path="/dashboard/contact" element={<ContactManager />} />
