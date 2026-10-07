@@ -59,15 +59,21 @@ export interface OrderRecord {
   customerName: string;
   customerPhone: string;
   orderType: 'delivery' | 'pickup';
+  deliveryAreaName?: string;
+  deliveryFee: number;
   deliveryAddress?: string;
   items: OrderLine[];
   subtotal: number;
+  discountCode?: string;
+  discountAmount: number;
   total: number;
   notes?: string;
   status: OrderStatus;
   channel: 'website' | 'whatsapp' | 'admin';
   paymentMethod: 'bank_transfer' | 'whatsapp';
   paymentStatus: PaymentStatus;
+  receiptUrl?: string;
+  paymentRejectionReason?: string;
   internalNotes: string;
   archivedAt?: string;
   archivedBy?: string;
@@ -98,6 +104,9 @@ export interface PaymentSettings {
   accountName: string;
   accountNumber: string;
 }
+
+export interface DeliveryAreaRecord { _id: string; name: string; fee: number; active: boolean; }
+export interface DiscountCodeRecord { _id: string; code: string; type: 'percent' | 'fixed'; value: number; minimumOrderValue: number; expiresAt?: string; usageLimit?: number; usedCount: number; active: boolean; }
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
