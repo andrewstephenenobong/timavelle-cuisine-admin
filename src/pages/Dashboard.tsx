@@ -1,7 +1,7 @@
 /* Timavelle admin overview: editorial workspace with a live Africa/Lagos wall clock. */
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ImageIcon, InboxIcon, SettingsIcon, UtensilsCrossed } from '../components/DashboardLayout';
+import { ImageIcon, InboxIcon, SettingsIcon, ShoppingBagIcon, UtensilsCrossed } from '../components/DashboardLayout';
 import api, { type HealthResponse } from '../lib/api';
 import '../styles/health.css';
 
@@ -9,6 +9,8 @@ const surfaces = [
   { label: 'Menu', state: 'Live data', detail: 'Keep the public menu focused.', icon: UtensilsCrossed, to: '/dashboard/menu' },
   { label: 'Gallery', state: 'Live data', detail: 'Shape the visual appetite.', icon: ImageIcon, to: '/dashboard/gallery' },
   { label: 'Enquiries', state: 'Lead inbox', detail: 'Follow up every request.', icon: InboxIcon, to: '/dashboard/enquiries' },
+  { label: 'Orders', state: 'Live queue', detail: 'Review payment and fulfilment.', icon: ShoppingBagIcon, to: '/dashboard/orders' },
+  { label: 'Checkout', state: 'Controls', detail: 'Manage areas and promotions.', icon: ShoppingBagIcon, to: '/dashboard/checkout' },
   { label: 'Settings', state: 'Workspace setup', detail: 'Security and site controls.', icon: SettingsIcon, to: '/dashboard/settings' },
 ];
 
@@ -117,7 +119,7 @@ export default function Dashboard() {
         </div>
         <Link className="admin-action" to="/dashboard/menu">Review content ↗</Link>
       </div>
-      <div className="admin-stat-grid">{surfaces.map((surface) => <Link key={surface.label} to={surface.to} className="admin-stat" style={{ textDecoration: 'none' }}><span className="admin-stat__label">{surface.label}</span><strong>{surface.state}</strong><small>{surface.detail}</small></Link>)}</div>
+      <div className="admin-stat-grid">{surfaces.map((surface) => <Link key={surface.label} to={surface.to} className="admin-stat" style={{ textDecoration: 'none' }}><surface.icon size={18} aria-hidden="true" /><span className="admin-stat__label">{surface.label}</span><strong>{surface.state}</strong><small>{surface.detail}</small></Link>)}</div>
       <div className="admin-card-grid">
         <section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><InboxIcon size={16} /></span><span className="admin-activity__copy"><strong>Enquiry inbox</strong><small>Track, qualify, and follow up leads</small></span><span className="admin-activity__time">Live</span></div></div></section>
         <section className="admin-card"><div className="admin-card__eyebrow">Lead workflow</div><h3>Every request has a next step.</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Follow up from one inbox.</strong>Review new enquiries, add internal notes, and move each request from first contact to closed.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/enquiries">Open enquiry inbox ↗</Link></section>

@@ -24,21 +24,22 @@ export const Menu = ({ size = 24 }: { size?: number }) => <IconBase size={size}>
 export const X = ({ size = 22 }: { size?: number }) => <IconBase size={size}><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></IconBase>;
 
 const navItems = [
-  { label: 'Overview', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
-  { label: 'Orders', to: '/dashboard/orders', icon: ShoppingBagIcon },
-  { label: 'Checkout', to: '/dashboard/checkout', icon: ShoppingBagIcon },
-  { label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
-  { label: 'Hero image', to: '/dashboard/hero-image', icon: PhotoIcon },
-  { label: 'The House image', to: '/dashboard/about-image', icon: ImageIcon },
-  { label: 'Testimonials', to: '/dashboard/testimonials', icon: Quote },
-  { label: 'Enquiries', to: '/dashboard/enquiries', icon: InboxIcon },
-  { label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },
-  { label: 'FAQs', to: '/dashboard/faqs', icon: Quote },
-  { label: 'Contact', to: '/dashboard/contact', icon: ImageIcon },
-  { label: 'Audit history', to: '/dashboard/audit-history', icon: HistoryIcon },
-  { label: 'Settings', to: '/dashboard/settings', icon: SettingsIcon },
+  { group: 'Operations', label: 'Overview', to: '/dashboard', icon: LayoutDashboard },
+  { group: 'Operations', label: 'Menu', to: '/dashboard/menu', icon: UtensilsCrossed },
+  { group: 'Operations', label: 'Orders', to: '/dashboard/orders', icon: ShoppingBagIcon },
+  { group: 'Operations', label: 'Checkout', to: '/dashboard/checkout', icon: ShoppingBagIcon },
+  { group: 'Operations', label: 'Enquiries', to: '/dashboard/enquiries', icon: InboxIcon },
+  { group: 'Content', label: 'Gallery', to: '/dashboard/gallery', icon: ImageIcon },
+  { group: 'Content', label: 'Hero image', to: '/dashboard/hero-image', icon: PhotoIcon },
+  { group: 'Content', label: 'The House image', to: '/dashboard/about-image', icon: ImageIcon },
+  { group: 'Content', label: 'Testimonials', to: '/dashboard/testimonials', icon: Quote },
+  { group: 'Content', label: 'Services', to: '/dashboard/services', icon: UtensilsCrossed },
+  { group: 'Content', label: 'FAQs', to: '/dashboard/faqs', icon: Quote },
+  { group: 'Content', label: 'Contact', to: '/dashboard/contact', icon: ImageIcon },
+  { group: 'System', label: 'Audit history', to: '/dashboard/audit-history', icon: HistoryIcon },
+  { group: 'System', label: 'Settings', to: '/dashboard/settings', icon: SettingsIcon },
 ];
+const navGroups = ['Operations', 'Content', 'System'] as const;
 
 const focusableSelector = 'button:not([disabled]), a[href], input, textarea, select';
 
@@ -110,16 +111,14 @@ export default function DashboardLayout() {
         <div className="admin-shell__brand"><span className="ad-mark" aria-hidden="true"><i /><i /><i /></span><span className="admin-shell__brand-copy"><strong>Timavelle</strong><small>Admin workspace</small></span></div>
         <button className="admin-shell__drawer-close" type="button" onClick={() => setOpen(false)} aria-label="Close navigation"><X size={20} /></button>
         <div className="admin-shell__stamp">Private culinary house<span>Content control room</span></div>
-        <div className="admin-shell__label">Workspace</div>
-        <nav className="admin-shell__nav" aria-label="Workspace navigation">
-          {navItems.map((item) => {
+        {navGroups.map((group) => <div className="admin-shell__nav-group" key={group}><div className="admin-shell__label">{group}</div><nav className="admin-shell__nav" aria-label={`${group} navigation`}>
+          {navItems.filter((item) => item.group === group).map((item) => {
             const Icon = item.icon;
             const active = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
             return <Link key={item.to} to={item.to} onClick={() => setOpen(false)} data-active={active} aria-current={active ? 'page' : undefined}><Icon size={18} />{item.label}{item.label === 'Testimonials' && <span className="admin-shell__badge">Review</span>}{item.label === 'Enquiries' && <span className="admin-shell__badge admin-shell__badge--quiet">Inbox</span>}{item.label === 'Orders' && <span className="admin-shell__badge admin-shell__badge--quiet">Live</span>}</Link>;
           })}
-        </nav>
+        </nav></div>)}
         <div className="admin-shell__divider" />
-        <div className="admin-shell__label">System</div>
         <a className="admin-shell__nav" href="mailto:hello@timavellecuisine.com" style={{ textDecoration: 'none' }}><span style={{ color: 'rgba(247,245,240,.62)' }}>?</span>Help centre</a>
         <div className="admin-shell__bottom"><div className="admin-shell__status">Health monitored<small>See Overview for live status</small></div><button className="admin-shell__logout" onClick={handleLogout}><LogOut size={17} />Log out</button></div>
       </aside>
