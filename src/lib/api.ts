@@ -35,8 +35,10 @@ export interface EnquiryListResponse {
 }
 
 
-export const orderStatuses = ['new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] as const;
+export const orderStatuses = ['awaiting_payment', 'new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] as const;
 export type OrderStatus = typeof orderStatuses[number];
+export const paymentStatuses = ['unpaid', 'receipt_submitted', 'paid', 'rejected', 'refunded'] as const;
+export type PaymentStatus = typeof paymentStatuses[number];
 
 export interface OrderLineAddOn {
   name: string;
@@ -63,8 +65,9 @@ export interface OrderRecord {
   total: number;
   notes?: string;
   status: OrderStatus;
-  channel: 'whatsapp' | 'admin';
-  paymentStatus: 'unpaid' | 'paid';
+  channel: 'website' | 'whatsapp' | 'admin';
+  paymentMethod: 'bank_transfer' | 'whatsapp';
+  paymentStatus: PaymentStatus;
   internalNotes: string;
   archivedAt?: string;
   archivedBy?: string;
@@ -86,6 +89,14 @@ export interface HealthResponse {
   uptimeSeconds?: number;
   checkedAt?: string;
   message?: string;
+}
+
+export interface PaymentSettings {
+  bankTransferEnabled: boolean;
+  whatsappEnabled: boolean;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
 }
 
 api.interceptors.request.use((config) => {
