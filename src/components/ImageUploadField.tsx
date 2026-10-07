@@ -1,10 +1,7 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import api from '../lib/api';
 
-interface Props {
-  value: string;
-  onChange: (url: string) => void;
-}
+interface Props { value: string; onChange: (url: string) => void; }
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const acceptedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/heic', 'image/heif']);
@@ -20,60 +17,36 @@ function errorMessage(error: unknown) {
 export default function ImageUploadField({ value, onChange }: Props) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [localPreview, setLocalPreview] = useState<string | null>(null);
 
-  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const input = event.currentTarget;
-    const file = input.files?.[0];
-    if (!file) return;
+  useEffect(() => () => { if (previewRef.current) URL.revokeObjectURL(previewRef.current); }, []);
 
-    setError('');
-    input.value = '';
-    if (!acceptedTypes.has(file.type.toLowerCase())) {
-      setError('Unsupported image format. Use JPG, PNG, WebP, AVIF, HEIC, or HEIF.');
-      return;
-    }
-    if (file.size > MAX_IMAGE_BYTES) {
-      setError('Image is too large. Choose an image up to 8 MB.');
-      return;
-    }
-
+  async function uploadFile(file: File) {
+    setError(''); setSuccess('');
+    if (!acceptedTypes.has(file.type.toLowerCase())) { setError('Unsupported image format. Use JPG, PNG, WebP, AVIF, HEIC, or HEIF.'); return; }
+    if (file.size > MAX_IMAGE_BYTES) { setError('Image is too large. Choose an image up to 8 MB.'); return; }
+    const temporaryUrl = URL.createObjectURL(file);
+    if (previewRef.current) URL.revokeObjectURL(previewRef.current);
+    previewRef.current = temporaryUrl;
+    setLocalPreview(temporaryUrl);
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('image', file);
+      const formData = new FormData(); formData.append('image', file);
       const response = await api.post<{ url?: string }>('/api/upload', formData);
       if (!response.data.url) throw new Error('The image service returned no URL.');
-      onChange(response.data.url);
-    } catch (uploadError) {
-      setError(errorMessage(uploadError));
-    } finally {
-      setUploading(false);
-    }
+      onChange(response.data.url); setSuccess('Image uploaded. Save the record to publish this change.');
+    } catch (uploadError) { setError(errorMessage(uploadError)); setLocalPreview(null); }
+    finally { setUploading(false); }
   }
 
-  return (
-    <div className="image-upload-field">
-      <label htmlFor={inputId} className="font-utility text-xs font-medium uppercase tracking-wide text-stone">Image</label>
-      <div className="mt-2 flex items-center gap-4">
-        {value && <img src={value} alt="Selected gallery image preview" className="h-20 w-20 rounded-lg object-cover" />}
-        <div className="flex-1">
-          <input
-            ref={inputRef}
-            id={inputId}
-            type="file"
-            accept=".jpg,.jpeg,.png,.webp,.avif,.heic,.heif,image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
-            onChange={handleFileChange}
-            disabled={uploading}
-            className="w-full rounded-xl border border-stone/20 px-4 py-2 font-body text-sm file:mr-4 file:rounded-full file:border-0 file:bg-emerald file:px-4 file:py-1.5 file:font-utility file:text-xs file:text-ivory hover:file:bg-emerald-deep"
-            aria-describedby={`${inputId}-help${error ? ` ${inputId}-error` : ''}`}
-          />
-          <p id={`${inputId}-help`} className="mt-1 font-body text-xs text-stone">JPG, PNG, WebP, AVIF, HEIC, or HEIF · max 8 MB</p>
-          {uploading && <p className="mt-1 font-body text-xs text-emerald" role="status">Uploading image securely…</p>}
-          {error && <p id={`${inputId}-error`} className="mt-1 font-body text-xs text-red-600" role="alert">{error}</p>}
-        </div>
-      </div>
-    </div>
-  );
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0]; event.currentTarget.value = ''; if (file) void uploadFile(file);
+  }
+
+  return <div className="image-upload-field"><div className="image-upload-field__heading"><label htmlFor={inputId}>Product image <span>Optional</span></label>{value && <button type="button" onClick={() => { onChange(''); setLocalPreview(null); setSuccess('Image removed from this record. Save to confirm.'); }}>Remove image</button>}</div><div className={`image-upload-field__dropzone${dragging ? ' is-dragging' : ''}${uploading ? ' is-uploading' : ''}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { if (event.currentTarget === event.target) setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); const file = event.dataTransfer.files?.[0]; if (file) void uploadFile(file); }}><div className="image-upload-field__preview">{(localPreview || value) ? <img src={localPreview || value} alt="Selected product preview" /> : <span aria-hidden="true">IMG</span>}</div><div className="image-upload-field__copy"><strong>{uploading ? 'Uploading securely…' : value ? 'Image ready to use' : 'Drop an image here'}</strong><p>{uploading ? 'Keep this page open while the image is being processed.' : 'Drag and drop, or choose a file from your device.'}</p><label className="image-upload-field__choose" htmlFor={inputId}>{value ? 'Replace image' : 'Choose image'}</label><input ref={inputRef} id={inputId} type="file" accept=".jpg,.jpeg,.png,.webp,.avif,.heic,.heif,image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif" onChange={handleFileChange} disabled={uploading} aria-describedby={`${inputId}-help${error ? ` ${inputId}-error` : ''}`} /></div></div><p id={`${inputId}-help`} className="image-upload-field__help">JPG, PNG, WebP, AVIF, HEIC, or HEIF · max 8 MB</p>{uploading && <p className="image-upload-field__status" role="status">Uploading image securely…</p>}{success && <p className="image-upload-field__success" role="status">{success}</p>}{error && <p id={`${inputId}-error`} className="image-upload-field__error" role="alert">{error}</p>}</div>;
 }

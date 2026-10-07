@@ -1,18 +1,9 @@
-/* Timavelle admin overview: editorial workspace with a live Africa/Lagos wall clock. */
+/* Timavelle admin overview: operational signals first, editorial polish second. */
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ImageIcon, InboxIcon, SettingsIcon, ShoppingBagIcon, UtensilsCrossed } from '../components/DashboardLayout';
-import api, { type HealthResponse } from '../lib/api';
+import { InboxIcon, ShoppingBagIcon, UtensilsCrossed } from '../components/DashboardLayout';
+import api, { type EnquiryListResponse, type HealthResponse, type OrderListResponse } from '../lib/api';
 import '../styles/health.css';
-
-const surfaces = [
-  { label: 'Menu', state: 'Live data', detail: 'Keep the public menu focused.', icon: UtensilsCrossed, to: '/dashboard/menu' },
-  { label: 'Gallery', state: 'Live data', detail: 'Shape the visual appetite.', icon: ImageIcon, to: '/dashboard/gallery' },
-  { label: 'Enquiries', state: 'Lead inbox', detail: 'Follow up every request.', icon: InboxIcon, to: '/dashboard/enquiries' },
-  { label: 'Orders', state: 'Live queue', detail: 'Review payment and fulfilment.', icon: ShoppingBagIcon, to: '/dashboard/orders' },
-  { label: 'Checkout', state: 'Controls', detail: 'Manage areas and promotions.', icon: ShoppingBagIcon, to: '/dashboard/checkout' },
-  { label: 'Settings', state: 'Workspace setup', detail: 'Security and site controls.', icon: SettingsIcon, to: '/dashboard/settings' },
-];
 
 const LAGOS_TIME_ZONE = 'Africa/Lagos';
 const lagosDateFormatter = new Intl.DateTimeFormat('en-NG', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: LAGOS_TIME_ZONE });
@@ -20,7 +11,8 @@ const lagosTimeFormatter = new Intl.DateTimeFormat('en-NG', { hour: '2-digit', m
 const healthTimeFormatter = new Intl.DateTimeFormat('en-NG', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: LAGOS_TIME_ZONE });
 
 type HealthState = 'loading' | 'connected' | 'degraded' | 'offline';
-
+type OverviewSnapshot = { activeOrders: number; attentionOrders: number; menuItems: number; enquiries: number; recentOrders: OrderListResponse['items'] };
+const emptySnapshot: OverviewSnapshot = { activeOrders: 0, attentionOrders: 0, menuItems: 0, enquiries: 0, recentOrders: [] };
 const healthCopy: Record<HealthState, { label: string; title: string; detail: string; width: string }> = {
   loading: { label: 'Checking', title: 'Checking the workspace connection.', detail: 'Confirming API and database readiness now.', width: '35%' },
   connected: { label: 'Connected', title: 'Content and conversations are connected.', detail: 'The API and database are responding. Published content and enquiries are available.', width: '100%' },
@@ -30,101 +22,26 @@ const healthCopy: Record<HealthState, { label: string; title: string; detail: st
 
 function useLagosClock() {
   const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
-
-  const parts = lagosTimeFormatter.formatToParts(now);
-  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? 0);
-  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? 0);
-  const second = Number(parts.find((part) => part.type === 'second')?.value ?? 0);
-
-  return {
-    dateLabel: lagosDateFormatter.format(now),
-    timeLabel: lagosTimeFormatter.format(now),
-    hour,
-    hourAngle: ((hour % 12) + minute / 60) * 30,
-    minuteAngle: (minute + second / 60) * 6,
-    secondAngle: second * 6,
-  };
+  useEffect(() => { const interval = window.setInterval(() => setNow(new Date()), 1000); return () => window.clearInterval(interval); }, []);
+  const parts = lagosTimeFormatter.formatToParts(now); const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? 0); const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? 0); const second = Number(parts.find((part) => part.type === 'second')?.value ?? 0);
+  return { dateLabel: lagosDateFormatter.format(now), timeLabel: lagosTimeFormatter.format(now), hour, hourAngle: ((hour % 12) + minute / 60) * 30, minuteAngle: (minute + second / 60) * 6, secondAngle: second * 6 };
 }
 
 function LagosWallClock({ clock }: { clock: ReturnType<typeof useLagosClock> }) {
-  return (
-    <div className="admin-wallclock" aria-label={`Current Lagos time: ${clock.dateLabel}, ${clock.timeLabel} WAT`} aria-live="polite">
-      <div className="admin-wallclock__face" aria-hidden="true">
-        <span className="admin-wallclock__tick admin-wallclock__tick--top" />
-        <span className="admin-wallclock__tick admin-wallclock__tick--right" />
-        <span className="admin-wallclock__tick admin-wallclock__tick--bottom" />
-        <span className="admin-wallclock__tick admin-wallclock__tick--left" />
-        <i className="admin-wallclock__hand admin-wallclock__hand--hour" style={{ transform: `rotate(${clock.hourAngle}deg)` }} />
-        <i className="admin-wallclock__hand admin-wallclock__hand--minute" style={{ transform: `rotate(${clock.minuteAngle}deg)` }} />
-        <i className="admin-wallclock__hand admin-wallclock__hand--second" style={{ transform: `rotate(${clock.secondAngle}deg)` }} />
-        <b className="admin-wallclock__pin" />
-      </div>
-      <div className="admin-wallclock__details">
-        <span className="admin-wallclock__date">{clock.dateLabel}</span>
-        <strong>{clock.timeLabel} <small>WAT</small></strong>
-        <span>Lagos · UTC+1</span>
-      </div>
-    </div>
-  );
+  return <div className="admin-wallclock" aria-label={`Current Lagos time: ${clock.dateLabel}, ${clock.timeLabel} WAT`} aria-live="polite"><div className="admin-wallclock__face" aria-hidden="true"><span className="admin-wallclock__tick admin-wallclock__tick--top" /><span className="admin-wallclock__tick admin-wallclock__tick--right" /><span className="admin-wallclock__tick admin-wallclock__tick--bottom" /><span className="admin-wallclock__tick admin-wallclock__tick--left" /><i className="admin-wallclock__hand admin-wallclock__hand--hour" style={{ transform: `rotate(${clock.hourAngle}deg)` }} /><i className="admin-wallclock__hand admin-wallclock__hand--minute" style={{ transform: `rotate(${clock.minuteAngle}deg)` }} /><i className="admin-wallclock__hand admin-wallclock__hand--second" style={{ transform: `rotate(${clock.secondAngle}deg)` }} /><b className="admin-wallclock__pin" /></div><div className="admin-wallclock__details"><span className="admin-wallclock__date">{clock.dateLabel}</span><strong>{clock.timeLabel} <small>WAT</small></strong><span>Lagos · UTC+1</span></div></div>;
 }
 
+function formatOrderTime(value: string) { return new Intl.DateTimeFormat('en-NG', { dateStyle: 'medium', timeStyle: 'short', timeZone: LAGOS_TIME_ZONE }).format(new Date(value)); }
+
 export default function Dashboard() {
-  const clock = useLagosClock();
-  const greeting = clock.hour < 12 ? 'Good morning' : clock.hour < 18 ? 'Good afternoon' : 'Good evening';
-  const [healthState, setHealthState] = useState<HealthState>('loading');
-  const [healthMessage, setHealthMessage] = useState(healthCopy.loading.detail);
-  const [lastChecked, setLastChecked] = useState<string | null>(null);
-  const [checkingHealth, setCheckingHealth] = useState(false);
+  const clock = useLagosClock(); const greeting = clock.hour < 12 ? 'Good morning' : clock.hour < 18 ? 'Good afternoon' : 'Good evening';
+  const [snapshot, setSnapshot] = useState<OverviewSnapshot>(emptySnapshot); const [snapshotLoading, setSnapshotLoading] = useState(true); const [snapshotError, setSnapshotError] = useState('');
+  const [healthState, setHealthState] = useState<HealthState>('loading'); const [healthMessage, setHealthMessage] = useState(healthCopy.loading.detail); const [lastChecked, setLastChecked] = useState<string | null>(null); const [checkingHealth, setCheckingHealth] = useState(false);
 
-  const checkHealth = useCallback(async () => {
-    setCheckingHealth(true);
-    setHealthState('loading');
-    setHealthMessage(healthCopy.loading.detail);
-    try {
-      const response = await api.get<HealthResponse>('/api/health', { timeout: 8000 });
-      const nextState: HealthState = response.data.status === 'ok' && response.data.database === 'ready' ? 'connected' : 'degraded';
-      setHealthState(nextState);
-      setHealthMessage(response.data.message || healthCopy[nextState].detail);
-    } catch (error: unknown) {
-      const response = typeof error === 'object' && error !== null && 'response' in error
-        ? (error as { response?: { data?: HealthResponse } }).response
-        : undefined;
-      const backendState = response?.data?.status === 'degraded' ? 'degraded' : 'offline';
-      setHealthState(backendState);
-      setHealthMessage(response?.data?.message || healthCopy[backendState].detail);
-    } finally {
-      setLastChecked(new Date().toISOString());
-      setCheckingHealth(false);
-    }
-  }, []);
+  const loadSnapshot = useCallback(async () => { setSnapshotLoading(true); setSnapshotError(''); try { const [ordersResponse, menuResponse, enquiriesResponse] = await Promise.all([api.get<OrderListResponse>('/api/orders', { params: { page: 1, limit: 20, scope: 'active' } }), api.get<{ items: Array<{ _id: string }> }>('/api/menu/admin', { params: { scope: 'active' } }), api.get<EnquiryListResponse>('/api/enquiries', { params: { page: 1, limit: 1, scope: 'active', status: 'new' } })]); const orderItems = ordersResponse.data.items; const attentionOrders = orderItems.filter((item) => ['awaiting_payment', 'new', 'confirmed'].includes(item.status)).length; setSnapshot({ activeOrders: ordersResponse.data.total, attentionOrders, menuItems: menuResponse.data.items.length, enquiries: enquiriesResponse.data.total, recentOrders: orderItems.slice(0, 4) }); } catch { setSnapshotError('Live business metrics are temporarily unavailable.'); } finally { setSnapshotLoading(false); } }, []);
+  const checkHealth = useCallback(async () => { setCheckingHealth(true); setHealthState('loading'); setHealthMessage(healthCopy.loading.detail); try { const response = await api.get<HealthResponse>('/api/health', { timeout: 8000 }); const nextState: HealthState = response.data.status === 'ok' && response.data.database === 'ready' ? 'connected' : 'degraded'; setHealthState(nextState); setHealthMessage(response.data.message || healthCopy[nextState].detail); } catch (error: unknown) { const response = typeof error === 'object' && error !== null && 'response' in error ? (error as { response?: { data?: HealthResponse } }).response : undefined; const backendState = response?.data?.status === 'degraded' ? 'degraded' : 'offline'; setHealthState(backendState); setHealthMessage(response?.data?.message || healthCopy[backendState].detail); } finally { setLastChecked(new Date().toISOString()); setCheckingHealth(false); } }, []);
+  useEffect(() => { void Promise.resolve().then(() => { void loadSnapshot(); void checkHealth(); }); }, [checkHealth, loadSnapshot]);
 
-  useEffect(() => {
-    void Promise.resolve().then(() => checkHealth());
-  }, [checkHealth]);
-
-  const currentHealth = healthCopy[healthState];
-
-  return (
-    <div className="admin-page">
-      <div className="admin-page__head">
-        <div>
-          <div className="admin-page__clock-row"><div className="admin-page__eyebrow">{clock.dateLabel}</div><LagosWallClock clock={clock} /></div>
-          <h2>{greeting}, <em>Timavelle.</em></h2>
-          <p className="admin-page__intro">A considered view of the content that shapes your public table.</p>
-        </div>
-        <Link className="admin-action" to="/dashboard/menu">Review content ↗</Link>
-      </div>
-      <div className="admin-stat-grid">{surfaces.map((surface) => <Link key={surface.label} to={surface.to} className="admin-stat" style={{ textDecoration: 'none' }}><surface.icon size={18} aria-hidden="true" /><span className="admin-stat__label">{surface.label}</span><strong>{surface.state}</strong><small>{surface.detail}</small></Link>)}</div>
-      <div className="admin-card-grid">
-        <section className="admin-card"><div className="admin-card__eyebrow">Recent movement</div><h3>Workspace activity</h3><div className="admin-activity"><div className="admin-activity__row"><span className="admin-activity__mark"><UtensilsCrossed size={16} /></span><span className="admin-activity__copy"><strong>Menu surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><ImageIcon size={16} /></span><span className="admin-activity__copy"><strong>Gallery surface</strong><small>Existing API-backed content</small></span><span className="admin-activity__time">Ready</span></div><div className="admin-activity__row"><span className="admin-activity__mark"><InboxIcon size={16} /></span><span className="admin-activity__copy"><strong>Enquiry inbox</strong><small>Track, qualify, and follow up leads</small></span><span className="admin-activity__time">Live</span></div></div></section>
-        <section className="admin-card"><div className="admin-card__eyebrow">Lead workflow</div><h3>Every request has a next step.</h3><div className="admin-manager-note" style={{ marginTop: 22 }}><strong>Follow up from one inbox.</strong>Review new enquiries, add internal notes, and move each request from first contact to closed.</div><Link className="admin-action" style={{ marginTop: 18, textDecoration: 'none' }} to="/dashboard/enquiries">Open enquiry inbox ↗</Link></section>
-      </div>
-      <section className="admin-card admin-status-card" data-health-state={healthState} aria-live="polite"><div className="admin-status-card__topline"><div className="admin-card__eyebrow">Workspace health</div><span className="admin-health-badge">{currentHealth.label}</span></div><h3>{currentHealth.title}</h3><p>{healthMessage}</p><div className="admin-status-bar" aria-hidden="true"><span style={{ width: currentHealth.width }} /></div><div className="admin-status-card__footer"><span>{lastChecked ? `Last checked ${healthTimeFormatter.format(new Date(lastChecked))} WAT` : 'Checking live status…'}</span><button type="button" className="admin-status-card__retry" onClick={() => void checkHealth()} disabled={checkingHealth}>{checkingHealth ? 'Checking…' : 'Retry connection ↗'}</button></div></section>
-    </div>
-  );
+  const currentHealth = healthCopy[healthState]; const metrics = [{ label: 'Active orders', value: snapshot.activeOrders, detail: 'Current fulfilment queue', icon: ShoppingBagIcon, to: '/dashboard/orders', tone: 'green' }, { label: 'Needs attention', value: snapshot.attentionOrders, detail: 'New, unpaid, or awaiting action', icon: InboxIcon, to: '/dashboard/orders', tone: 'copper' }, { label: 'Menu products', value: snapshot.menuItems, detail: 'Active public dishes', icon: UtensilsCrossed, to: '/dashboard/menu', tone: 'gold' }, { label: 'New enquiries', value: snapshot.enquiries, detail: 'Uncontacted requests', icon: InboxIcon, to: '/dashboard/enquiries', tone: 'ink' }];
+  return <div className="admin-page"><div className="admin-page__head"><div><div className="admin-page__clock-row"><div className="admin-page__eyebrow">{clock.dateLabel}</div><LagosWallClock clock={clock} /></div><h2>{greeting}, <em>Timavelle.</em></h2><p className="admin-page__intro">A calm operational view of what needs attention across the public table.</p></div><div className="admin-page__head-actions"><Link className="admin-action" to="/dashboard/orders">View orders ↗</Link><Link className="admin-action admin-action--quiet" to="/dashboard/menu">Manage menu ↗</Link></div></div><section className="admin-overview-metrics" aria-label="Operational overview">{metrics.map((metric) => { const Icon = metric.icon; return <Link key={metric.label} to={metric.to} className={`admin-overview-metric admin-overview-metric--${metric.tone}`}><Icon size={18} aria-hidden="true" /><span>{metric.label}</span><strong>{snapshotLoading ? '—' : metric.value}</strong><small>{metric.detail}</small></Link>; })}</section>{snapshotError && <div className="admin-inline-alert" role="alert">{snapshotError}<button type="button" onClick={() => void loadSnapshot()}>Retry</button></div>}<div className="admin-card-grid"><section className="admin-card"><div className="admin-card__eyebrow">Recent orders</div><h3>Keep the table moving.</h3>{snapshotLoading ? <div className="admin-skeleton-list" aria-label="Loading recent orders"><span /><span /><span /></div> : snapshot.recentOrders.length === 0 ? <div className="admin-empty-compact"><strong>No active orders yet.</strong><span>Orders placed through the public menu will appear here.</span><Link className="admin-action" to="/dashboard/menu">Review menu ↗</Link></div> : <div className="admin-recent-orders">{snapshot.recentOrders.map((order) => <Link key={order._id} to="/dashboard/orders" className="admin-recent-order"><span><strong>{order.customerName}</strong><small>{order.items.length} item{order.items.length === 1 ? '' : 's'} · {formatOrderTime(order.createdAt)}</small></span><b>{order.status.replace('_', ' ')}</b></Link>)}</div>}</section><section className="admin-card"><div className="admin-card__eyebrow">Quick actions</div><h3>What would you like to do?</h3><div className="admin-quick-actions"><Link to="/dashboard/menu">Add or edit a product <span>↗</span></Link><Link to="/dashboard/checkout">Manage delivery fees <span>↗</span></Link><Link to="/dashboard/enquiries">Open enquiry inbox <span>↗</span></Link><Link to="/dashboard/gallery">Update gallery imagery <span>↗</span></Link></div></section></div><section className="admin-card admin-status-card" data-health-state={healthState} aria-live="polite"><div className="admin-status-card__topline"><div className="admin-card__eyebrow">Workspace health</div><span className="admin-health-badge">{currentHealth.label}</span></div><h3>{currentHealth.title}</h3><p>{healthMessage}</p><div className="admin-status-bar" aria-hidden="true"><span style={{ width: currentHealth.width }} /></div><div className="admin-status-card__footer"><span>{lastChecked ? `Last checked ${healthTimeFormatter.format(new Date(lastChecked))} WAT` : 'Checking live status…'}</span><button type="button" className="admin-status-card__retry" onClick={() => void checkHealth()} disabled={checkingHealth}>{checkingHealth ? 'Checking…' : 'Retry connection ↗'}</button></div></section></div>;
 }
