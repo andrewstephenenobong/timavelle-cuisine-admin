@@ -8,6 +8,7 @@ import MenuManager from './pages/MenuManager';
 import GalleryManager from './pages/GalleryManager';
 import TestimonialsManager from './pages/TestimonialsManager';
 import Settings from './pages/Settings';
+import CheckoutManagement from './pages/CheckoutManagement';
 import ContentManager from './pages/ContentManager';
 import ContactManager from './pages/ContactManager';
 import Enquiries from './pages/Enquiries';
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/dashboard/contact" element={<ContactManager />} />
             <Route path="/dashboard/audit-history" element={<AuditHistory />} />
             <Route path="/dashboard/settings" element={<Settings />} />
+            <Route path="/dashboard/checkout" element={<CheckoutManagement />} />
           </Route>
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>

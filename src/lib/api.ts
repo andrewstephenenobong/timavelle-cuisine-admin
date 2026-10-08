@@ -35,8 +35,10 @@ export interface EnquiryListResponse {
 }
 
 
-export const orderStatuses = ['new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] as const;
+export const orderStatuses = ['awaiting_payment', 'new', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'] as const;
 export type OrderStatus = typeof orderStatuses[number];
+export const paymentStatuses = ['unpaid', 'receipt_submitted', 'paid', 'rejected', 'refunded'] as const;
+export type PaymentStatus = typeof paymentStatuses[number];
 
 export interface OrderLineAddOn {
   name: string;
@@ -57,14 +59,21 @@ export interface OrderRecord {
   customerName: string;
   customerPhone: string;
   orderType: 'delivery' | 'pickup';
+  deliveryAreaName?: string;
+  deliveryFee: number;
   deliveryAddress?: string;
   items: OrderLine[];
   subtotal: number;
+  discountCode?: string;
+  discountAmount: number;
   total: number;
   notes?: string;
   status: OrderStatus;
-  channel: 'whatsapp' | 'admin';
-  paymentStatus: 'unpaid' | 'paid';
+  channel: 'website' | 'whatsapp' | 'admin';
+  paymentMethod: 'bank_transfer' | 'whatsapp';
+  paymentStatus: PaymentStatus;
+  receiptUrl?: string;
+  paymentRejectionReason?: string;
   internalNotes: string;
   archivedAt?: string;
   archivedBy?: string;
@@ -87,6 +96,17 @@ export interface HealthResponse {
   checkedAt?: string;
   message?: string;
 }
+
+export interface PaymentSettings {
+  bankTransferEnabled: boolean;
+  whatsappEnabled: boolean;
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+}
+
+export interface DeliveryAreaRecord { _id: string; name: string; fee: number; active: boolean; }
+export interface DiscountCodeRecord { _id: string; code: string; type: 'percent' | 'fixed'; value: number; minimumOrderValue: number; expiresAt?: string; usageLimit?: number; usedCount: number; active: boolean; }
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
